@@ -1,0 +1,79 @@
+package com.amrit.practice.filesbygooglereplica.loaders;
+
+import android.content.ContentUris;
+import android.content.Context;
+import android.database.Cursor;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.loader.content.AsyncTaskLoader;
+
+import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
+
+import org.jetbrains.annotations.NotNull;
+import java.util.ArrayList;
+
+public class MediaVideoLoader extends AsyncTaskLoader<ArrayList<VideoUtil>> {
+
+    private final Context context;
+    private final String LOG_TAG = MediaVideoLoader.class.getSimpleName();
+
+    public MediaVideoLoader(@NonNull @NotNull Context context) {
+        super(context);
+        this.context = context;
+    }
+
+    @Override
+    protected void onStartLoading() {
+        super.onStartLoading();
+        forceLoad();
+    }
+
+    @Nullable
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public ArrayList<VideoUtil> loadInBackground() {
+
+        ArrayList<VideoUtil> list = new ArrayList<>();
+
+        String[] projection = new String[]{
+                MediaStore.Video.Media._ID,
+                MediaStore.Video.Media.DISPLAY_NAME,
+                MediaStore.Video.Media.SIZE
+        };
+
+        try (Cursor cursor = context.getContentResolver().query(
+                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                MediaStore.Video.Media.DISPLAY_NAME + " ASC"
+        )) {
+            assert cursor != null;
+            int idColumn = cursor.getColumnIndex(MediaStore.Video.Media._ID);
+            int sizeColumn = cursor.getColumnIndex(MediaStore.Video.Media.SIZE);
+            int nameColumn = cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME);
+
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(idColumn);
+                int size = cursor.getInt(sizeColumn);
+                String name = cursor.getString(nameColumn);
+                Uri contentUri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+
+                VideoUtil videoUtil = new VideoUtil(contentUri.toString(), size, name);
+                list.add(videoUtil);
+
+            }
+        } catch (Exception e) {
+            Log.e(LOG_TAG, "Can't Load Files");
+        }
+
+        Log.e(LOG_TAG, "Back process Done");
+
+        return list;
+        
+    }
+}

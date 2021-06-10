@@ -1,0 +1,93 @@
+package com.amrit.practice.filesbygooglereplica.loaders;
+
+import android.content.ContentUris;
+import android.content.Context;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.util.Size;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.loader.content.AsyncTaskLoader;
+
+import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
+
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
+
+    private final Context context;
+    private final String LOG_TAG = MediaAudioLoader.class.getSimpleName();
+
+    public MediaAudioLoader(@NonNull @NotNull Context context) {
+        super(context);
+        this.context = context;
+    }
+
+    @Override
+    protected void onStartLoading() {
+        super.onStartLoading();
+        forceLoad();
+    }
+
+    @Nullable
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public ArrayList<AudioUtil> loadInBackground() {
+        ArrayList<AudioUtil> list = new ArrayList<>();
+
+        String[] projection = new String[]{
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.SIZE
+        };
+
+        try (Cursor cursor = context.getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                MediaStore.Audio.Media.TITLE + " ASC"
+        )){
+            assert cursor != null;
+            int idColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
+            int sizeColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.SIZE);
+            int titleColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+
+            while (cursor.moveToNext()){
+                long id = cursor.getLong(idColumnIndex);
+                int size = cursor.getInt(sizeColumnIndex);
+                String title = cursor.getString(titleColumnIndex);
+                Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+
+                AudioUtil audioUtil;
+
+                Bitmap bitmap = null;
+                try {
+                    bitmap = context.getContentResolver().loadThumbnail(
+                            contentUri,
+                            new Size(200, 200),
+                            null
+                    );
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Bitmap not available");
+                }
+
+                audioUtil = new AudioUtil(contentUri.toString(), size, title, bitmap);
+                list.add(audioUtil);
+            }
+
+        }catch (Exception e) {
+            Log.e(LOG_TAG, "Can't Load Files");
+        }
+
+        return list;
+    }
+
+}
