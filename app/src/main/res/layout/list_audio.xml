@@ -36,7 +36,7 @@
             tools:text="com.UCMobile.intl" />
 
         <ImageView
-            android:id="@+id/list_more_image"
+            android:id="@+id/list_more_audio"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:src="@drawable/ic_baseline_more_vert_24"

@@ -17,4 +17,11 @@
     <string name="more">more</string>
     <string name="image">Image</string>
     <string name="image_icon">Image_icon</string>
+    <string name="rename">Rename</string>
+    <string name="share">Share</string>
+    <string name="open_with">Open With</string>
+    <string name="file_info">File Info</string>
+    <string name="delete_permanently">Delete Permanently</string>
+    <string name="yes">Yes!!</string>
+    <string name="no">No..</string>
 </resources>

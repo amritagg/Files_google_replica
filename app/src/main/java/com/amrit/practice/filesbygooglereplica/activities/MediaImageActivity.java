@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -47,6 +48,7 @@ public class MediaImageActivity extends AppCompatActivity
 
         gridView.setOnItemClickListener(onItemClickListener);
         listView.setOnItemClickListener(onItemClickListener);
+
     }
 
     private final AdapterView.OnItemClickListener onItemClickListener = (adapterView, view, i, l) -> {
@@ -100,14 +102,14 @@ public class MediaImageActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader, ArrayList<ImageUtil> data) {
-        gridView.setVisibility(View.VISIBLE);
-//        listView.setVisibility(View.VISIBLE);
+//        gridView.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
         MediaImageAdapter imageAdapter = new MediaImageAdapter(getApplicationContext(), data);
-        gridView.setAdapter(imageAdapter);
+//        gridView.setAdapter(imageAdapter);
         imageUtils = data;
-//        listView.setAdapter(imageAdapter);
+        listView.setAdapter(imageAdapter);
     }
 
     @Override
