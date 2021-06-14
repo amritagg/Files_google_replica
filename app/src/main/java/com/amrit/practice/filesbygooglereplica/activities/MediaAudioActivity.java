@@ -39,11 +39,11 @@ public class MediaAudioActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_media_audio);
+        setContentView(R.layout.activity_media);
 
-        progressBar = findViewById(R.id.media_audio_progress_bar);
-        gridView = findViewById(R.id.grid_view_audio);
-        listView = findViewById(R.id.list_view_audio);
+        progressBar = findViewById(R.id.media_progress_bar);
+        gridView = findViewById(R.id.media_grid_view);
+        listView = findViewById(R.id.media_list_view);
 
         showAudio();
 

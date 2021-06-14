@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +56,7 @@ public class MediaAudioAdapter extends BaseAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
             if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_view, null);
         }
 
         ImageView imageView;

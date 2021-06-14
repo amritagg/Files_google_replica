@@ -53,7 +53,7 @@ public class MediaDownloadAdapter extends BaseAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
             if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_view, null);
         }
 
         ImageView imageView;
@@ -83,7 +83,7 @@ public class MediaDownloadAdapter extends BaseAdapter {
         Uri contentUris = Uri.parse(downloadUtils.get(position).getUri());
         Glide.with(context)
                 .load(contentUris)
-//                .error(context.getDrawable(R.drawable.ic_baseline_document_24))
+                .error(context.getDrawable(R.drawable.ic_baseline_document_24))
                 .into(imageView);
 
         return convertView;

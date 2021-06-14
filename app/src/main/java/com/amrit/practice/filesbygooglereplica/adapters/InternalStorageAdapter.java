@@ -18,13 +18,14 @@ import java.util.ArrayList;
 
 public class InternalStorageAdapter extends BaseAdapter {
 
-    private static final boolean isList = true;
+    private final boolean isList;
     private final Context context;
     private final ArrayList<InternalStorageUtil> utils;
 
-    public InternalStorageAdapter(Context context, ArrayList<InternalStorageUtil> utils) {
+    public InternalStorageAdapter(Context context, ArrayList<InternalStorageUtil> utils, boolean isList) {
         this.context = context;
         this.utils = utils;
+        this.isList = isList;
     }
 
     @Override
@@ -49,14 +50,14 @@ public class InternalStorageAdapter extends BaseAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
             if (!isList) convertView = layoutInflater.inflate(R.layout.grid_internal, null);
-            else convertView = layoutInflater.inflate(R.layout.list_internal, null);
+            else convertView = layoutInflater.inflate(R.layout.list_view, null);
         }
 
         ImageView imageView;
 
         if (isList) {
-            imageView = convertView.findViewById(R.id.internal_list_image_view);
-            TextView name = convertView.findViewById(R.id.file_name);
+            imageView = convertView.findViewById(R.id.list_image_view);
+            TextView name = convertView.findViewById(R.id.media_name_list);
             name.setText(utils.get(position).getName());
             if (!utils.get(position).isFolder()) {
                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);

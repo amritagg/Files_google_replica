@@ -39,11 +39,11 @@ public class MediaImageActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_media_image);
+        setContentView(R.layout.activity_media);
 
-        progressBar = findViewById(R.id.media_image_progress_bar);
-        gridView = findViewById(R.id.grid_view_image);
-        listView = findViewById(R.id.list_view_image);
+        progressBar = findViewById(R.id.media_progress_bar);
+        gridView = findViewById(R.id.media_grid_view);
+        listView = findViewById(R.id.media_list_view);
 
         startGallery();
 

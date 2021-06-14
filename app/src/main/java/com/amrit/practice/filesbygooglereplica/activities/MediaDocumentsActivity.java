@@ -38,11 +38,11 @@ public class MediaDocumentsActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_media_documents);
+        setContentView(R.layout.activity_media);
 
-        gridView = findViewById(R.id.grid_view_doc);
-        listView = findViewById(R.id.list_view_doc);
-        progressBar = findViewById(R.id.media_doc_progress_bar);
+        progressBar = findViewById(R.id.media_progress_bar);
+        gridView = findViewById(R.id.media_grid_view);
+        listView = findViewById(R.id.media_list_view);
         showDocuments();
 
         gridView.setOnItemClickListener(onItemClickListener);

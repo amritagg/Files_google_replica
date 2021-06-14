@@ -40,6 +40,7 @@ public class InternalStorageActivity extends AppCompatActivity
     private File visibleFileListParent;
     private LoaderManager loaderManager;
     private String HEAD_FILE;
+    private final static boolean isList = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -195,14 +196,20 @@ public class InternalStorageActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<InternalStorageUtil>> loader, ArrayList<InternalStorageUtil> data) {
-//        gridView.setVisibility(View.VISIBLE);
-        listView.setVisibility(View.VISIBLE);
+
+        internalStorageAdapter = new InternalStorageAdapter(this, data, isList);
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        internalStorageAdapter = new InternalStorageAdapter(this, data);
-//        gridView.setAdapter(internalStorageAdapter);
         utils = data;
-        listView.setAdapter(internalStorageAdapter);
+
+        if(isList){
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(internalStorageAdapter);
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(internalStorageAdapter);
+        }
+
     }
 
     @Override

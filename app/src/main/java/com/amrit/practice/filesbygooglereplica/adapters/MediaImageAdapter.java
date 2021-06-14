@@ -57,7 +57,7 @@ public class MediaImageAdapter extends BaseAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
             if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_view, null);
         }
 
         ImageView imageView;
