@@ -85,14 +85,14 @@ public class MediaAudioActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<AudioUtil>> loader, ArrayList<AudioUtil> data) {
-        gridView.setVisibility(View.VISIBLE);
-//        listView.setVisibility(View.VISIBLE);
+//        gridView.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
         MediaAudioAdapter audioAdapter = new MediaAudioAdapter(getApplicationContext(), data);
-        gridView.setAdapter(audioAdapter);
+//        gridView.setAdapter(audioAdapter);
         audioUtil = data;
-//        listView.setAdapter(audioAdapter);
+        listView.setAdapter(audioAdapter);
     }
 
     @Override

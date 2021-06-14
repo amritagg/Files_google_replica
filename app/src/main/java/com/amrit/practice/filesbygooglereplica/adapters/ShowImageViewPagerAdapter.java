@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.activities.ShowImageActivity;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
@@ -47,11 +48,7 @@ public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageVie
                     .into(holder.imageView);
         }else {
             String uri_string = imageUris.get(position);
-//            uri_string = "/file:" + uri_string;
             Uri uri = Uri.parse(uri_string);
-//            Glide.with(mContext)
-//                    .load(uri)
-//                    .into(holder.imageView);
             holder.imageView.setImageURI(uri);
         }
     }

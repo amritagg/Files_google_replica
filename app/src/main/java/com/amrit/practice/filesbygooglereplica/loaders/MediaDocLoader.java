@@ -71,7 +71,6 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
                 long size = f.length();
                 String uri = Uri.parse(f.getAbsolutePath()).toString();
                 DocumentsUtil documentsUtil = new DocumentsUtil(uri, size, name);
-                Log.e(LOG_TAG, f.getAbsolutePath());
                 list.add(documentsUtil);
             }
         }
@@ -86,10 +85,10 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
 
         for(File file: listFiles){
             if(file.isDirectory() && !file.isHidden()){
-                if(!file.getAbsolutePath().contains("/storage/emulated/0/WhatsApp/Media/WhatsApp") && !file.getAbsolutePath().contains("Sent")){
+//                if(!file.getAbsolutePath().contains("/storage/emulated/0/WhatsApp/Media") && !file.getAbsolutePath().contains("Sent")){
                     getDocumentFiles(Objects.requireNonNull(file.listFiles()));
                     result.addAll(getDocumentFiles(Objects.requireNonNull(file.listFiles())));
-                }
+//                }
 
             }else {
                 String name = file.getName();
@@ -108,9 +107,10 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
 
     private static String[] docType(){
         return new String[]{
-                ".pdf", ".docx", ".odt", ".rtf", ".txt", ".html", ".epub",
+                ".pdf"
+                /*, ".docx", ".odt", ".rtf", ".txt", ".html", ".epub",
                 ".xlsx", ".ods", ".tsv", ".csv",
-                ".pptx", ".odp"
+                ".pptx", ".odp"*/
         };
     }
 

@@ -6,10 +6,12 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -29,6 +31,7 @@ public class MediaDocumentsActivity extends AppCompatActivity
     private GridView gridView;
     private ListView listView;
     private static final int LoaderManger_ID = 25;
+    private ArrayList<DocumentsUtil> documentsUtils;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -41,65 +44,18 @@ public class MediaDocumentsActivity extends AppCompatActivity
         progressBar = findViewById(R.id.media_doc_progress_bar);
         showDocuments();
 
-//        gridView.setOnItemClickListener(onItemClickListener);
-//        listView.setOnItemClickListener(onItemClickListener);
+        gridView.setOnItemClickListener(onItemClickListener);
+        listView.setOnItemClickListener(onItemClickListener);
     }
 
-//    private final AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
-//        @Override
-//        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-//            openFile(Uri.parse(documentsUtils.get(position).getUri()));
-//        }
-//    };
-
-//    private void openFile(Uri pickerInitialUri) {
-//
-//        Intent intent = new Intent(Intent.ACTION_VIEW);
-//        intent.setDataAndType(pickerInitialUri, "application/pdf");
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//        startActivity(intent);
-//
-//        Intent objIntent = new Intent(Intent.ACTION_VIEW);
-//        objIntent.setDataAndType(pickerInitialUri, "application/pdf");
-//        objIntent.setFlags(Intent. FLAG_ACTIVITY_CLEAR_TOP);
-//        startActivity(objIntent);
-//
-//        Intent shareIntent = new Intent();
-//        shareIntent.setAction(Intent.ACTION_VIEW);
-//        shareIntent.putExtra(Intent.EXTRA_STREAM, pickerInitialUri);
-//        shareIntent.setType("application/pdf");
-//        startActivity(Intent.createChooser(shareIntent, "send to"));
-//
-//        Intent target = new Intent(Intent.ACTION_VIEW);
-//        target.setDataAndType(pickerInitialUri,"application/pdf");
-//        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//
-//        Intent intent = Intent.createChooser(target, "Open File");
-//        try {
-//            startActivity(intent);
-//        } catch (ActivityNotFoundException e) {
-//            Toast.makeText(this, "No app found", Toast.LENGTH_SHORT).show();
-//        }
-//
-//        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-//        intent.addCategory(Intent.CATEGORY_OPENABLE);
-//        intent.setType("application/pdf");
-//
-//        intent.putExtra(DocumentsContract.EXTRA_INITIAL_URI, pickerInitialUri);
-//
-//        documentOpenerActivity.launch(intent);
-//        startActivityForResult(intent, PICK_PDF_FILE);
-//  }
-
-//    ActivityResultLauncher<Intent> documentOpenerActivity = registerForActivityResult(
-//            new ActivityResultContracts.StartActivityForResult(),
-//            result -> {
-//                if (result.getResultCode() != RESULT_OK) {
-//                    Toast.makeText(this, "No app found to open this file", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//    );
-
+    private final AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+        @Override
+        public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+            Intent intent = new Intent(MediaDocumentsActivity.this, ShowPdfActivity.class);
+            intent.putExtra("pdf_uri", documentsUtils.get(position).getUri());
+            startActivity(intent);
+        }
+    };
 
     private void showDocuments(){
         LoaderManager loaderManager = LoaderManager.getInstance(this);
@@ -126,6 +82,7 @@ public class MediaDocumentsActivity extends AppCompatActivity
         MediaDocAdapter mediaDocAdapter = new MediaDocAdapter(getApplicationContext(), data);
 //        gridView.setAdapter(mediaDocAdapter);
         listView.setAdapter(mediaDocAdapter);
+        documentsUtils = data;
     }
 
     @Override

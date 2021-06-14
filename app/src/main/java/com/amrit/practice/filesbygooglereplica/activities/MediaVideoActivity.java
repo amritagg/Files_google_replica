@@ -90,14 +90,14 @@ public class MediaVideoActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader, ArrayList<VideoUtil> data) {
-        gridView.setVisibility(View.VISIBLE);
-//        listView.setVisibility(View.VISIBLE);
+//        gridView.setVisibility(View.VISIBLE);
+        listView.setVisibility(View.VISIBLE);
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
         MediaVideoAdapter videoAdapter = new MediaVideoAdapter(data, getApplicationContext());
-        gridView.setAdapter(videoAdapter);
+//        gridView.setAdapter(videoAdapter);
         videoUtils = data;
-//        listView.setAdapter(videoAdapter);
+        listView.setAdapter(videoAdapter);
     }
 
     @Override

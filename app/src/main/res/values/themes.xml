@@ -1,15 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
     <style name="Theme.FilesByGoogleReplica" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
-        <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
         <item name="colorOnPrimary">@color/white</item>
-
         <item name="android:fillColor">@color/icon</item>
-        <!-- Status bar color. -->
-<!--        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>-->
-        <!-- Customize your theme here. -->
     </style>
 
     <style name="Theme.FilesByGoogleReplica.NoActionBar">
@@ -19,4 +13,24 @@
 
     <style name="Theme.FilesByGoogleReplica.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
     <style name="Theme.FilesByGoogleReplica.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+    <style name="Theme.FilesByGoogleReplica.Fullscreen" parent="Theme.FilesByGoogleReplica">
+        <item name="android:actionBarStyle">
+            @style/Widget.Theme.FilesByGoogleReplica.ActionBar.Fullscreen
+        </item>
+        <item name="android:windowActionBarOverlay">true</item>
+        <item name="android:windowBackground">@null</item>
+    </style>
+
+    <style name="ThemeOverlay.FilesByGoogleReplica.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_600</item>
+        <item name="fullscreenTextColor">@color/light_blue_A200</item>
+    </style>
+
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">#009688</item>
+        <item name="colorPrimaryDark">#00796B</item>
+        <item name="colorAccent">#536DFE</item>
+    </style>
+
 </resources>

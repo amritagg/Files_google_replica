@@ -34,14 +34,6 @@
             android:maxLines="1"
             tools:text="com.UCMobile.intl" />
 
-        <ImageView
-            android:id="@+id/list_more_download"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@drawable/ic_baseline_more_vert_24"
-            android:paddingVertical="10dp"
-            android:contentDescription="@string/more" />
-
     </LinearLayout>
 
     <View

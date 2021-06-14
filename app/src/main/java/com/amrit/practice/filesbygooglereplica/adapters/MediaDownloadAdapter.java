@@ -21,7 +21,7 @@ import java.util.ArrayList;
 
 public class MediaDownloadAdapter extends BaseAdapter {
 
-    boolean isList = false;
+    boolean isList = true;
     private final ArrayList<DownloadUtils> downloadUtils;
     private final Context context;
 

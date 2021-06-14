@@ -24,4 +24,8 @@
     <string name="delete_permanently">Delete Permanently</string>
     <string name="yes">Yes!!</string>
     <string name="no">No..</string>
+    <string name="title_activity_temp">FullscreenActivity</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="pdf">PDF</string>
 </resources>

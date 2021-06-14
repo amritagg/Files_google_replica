@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,11 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.appcompat.app.AlertDialog;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.ImageInfoActivity;
-import com.amrit.practice.filesbygooglereplica.activities.MediaImageActivity;
 import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -93,21 +88,21 @@ public class MediaImageAdapter extends BaseAdapter {
         ImageView imageMore = convertView.findViewById(R.id.list_more_image);
         imageMore.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageMore);
-            popupMenu.getMenuInflater().inflate(R.menu.popup_image, popupMenu.getMenu());
+            popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
 
                 switch (menuItem.getItemId()){
-                    case R.id.image_share:
+                    case R.id.share:
                         shareImage(imageUtil.get(position).getUri());
                         break;
-                    case R.id.image_open_with:
+                    case R.id.open_with:
                         imageOpenWith(position);
                         break;
-                    case R.id.image_file_info:
+                    case R.id.file_info:
                         infoImage(position);
                         break;
-                    case R.id.image_delete_permanent:
+                    case R.id.delete_permanent:
                         deleteToast();
                         break;
                     case R.id.yes:
@@ -125,7 +120,6 @@ public class MediaImageAdapter extends BaseAdapter {
         });
 
     }
-
     private void deleteToast(){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,

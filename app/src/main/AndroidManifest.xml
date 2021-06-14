@@ -15,7 +15,7 @@
         android:requestLegacyExternalStorage="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.FilesByGoogleReplica">
+        android:theme="@style/AppTheme">
         <activity android:name=".activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,6 +25,7 @@
         </activity>
         <activity
             android:name=".activities.MediaImageActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowImageActivity"
@@ -36,26 +37,37 @@
             android:parentActivityName=".activities.ShowImageActivity" />
         <activity
             android:name=".activities.MediaAudioActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowAudioActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.MediaAudioActivity" />
         <activity
             android:name=".activities.MediaVideoActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowVideoActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.MediaVideoActivity" />
         <activity
             android:name=".activities.MediaDownloadActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.MediaDocumentsActivity"
+            android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
-            android:name=".activities.InternalStorageActivity"
-            android:parentActivityName=".activities.HomeActivity"/>
+            android:name=".activities.ShowPdfActivity"
+            android:launchMode="singleTop"
 
+            android:parentActivityName=".activities.MediaDocumentsActivity" />
+        <activity
+            android:name=".activities.InternalStorageActivity"
+            android:launchMode="singleTop"
+            android:parentActivityName=".activities.HomeActivity" />
     </application>
 
 </manifest>

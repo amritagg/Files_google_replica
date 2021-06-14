@@ -1,7 +1,9 @@
 package com.amrit.practice.filesbygooglereplica.activities;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
@@ -9,8 +11,12 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
@@ -23,6 +29,7 @@ import java.util.Date;
 
 public class ShowImageActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = ShowImageActivity.class.getSimpleName();
     ViewPager2 viewPager;
     ArrayList<String> image_uris, image_names, image_location;
     ArrayList<Integer> image_size;
@@ -41,10 +48,22 @@ public class ShowImageActivity extends AppCompatActivity {
         delete = findViewById(R.id.image_delete);
         info = findViewById(R.id.image_info);
 
+//        View decorView = getWindow().getDecorView();
+        // Hide the status bar.
+//        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN; // & View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+//        decorView.setSystemUiVisibility(uiOptions);
+        // Remember that you should never show the action bar if the
+        // status bar is hidden, so hide that too if necessary.
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.hide();
+
+        Window window = getWindow();
+        window.setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+                WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+        window.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
         intent = getIntent();
         viewPager = findViewById(R.id.show_image_view_pager);
-
-
 
         if(intent.hasExtra("bundle")){
             Bundle bundle = intent.getBundleExtra("bundle");
