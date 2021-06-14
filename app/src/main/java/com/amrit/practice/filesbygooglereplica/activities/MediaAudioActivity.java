@@ -34,6 +34,7 @@ public class MediaAudioActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 15;
     private ArrayList<AudioUtil> audioUtil;
+    private final static boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -85,14 +86,20 @@ public class MediaAudioActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<AudioUtil>> loader, ArrayList<AudioUtil> data) {
-//        gridView.setVisibility(View.VISIBLE);
-        listView.setVisibility(View.VISIBLE);
+
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        MediaAudioAdapter audioAdapter = new MediaAudioAdapter(getApplicationContext(), data);
-//        gridView.setAdapter(audioAdapter);
+        MediaAudioAdapter audioAdapter = new MediaAudioAdapter(getApplicationContext(), data, isList);
         audioUtil = data;
-        listView.setAdapter(audioAdapter);
+
+        if(isList){
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(audioAdapter);
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(audioAdapter);
+        }
+
     }
 
     @Override

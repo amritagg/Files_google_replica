@@ -15,26 +15,24 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.ImageInfoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
-
+import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class MediaAudioAdapter extends BaseAdapter {
 
     public final String LOG_TAG = MediaAudioAdapter.class.getSimpleName();
 
-    boolean isList = true;
+    private final boolean isList;
     private final ArrayList<AudioUtil> audioUtils;
     private final Context context;
     private Toast mToast;
 
-    public MediaAudioAdapter(Context context, ArrayList<AudioUtil> audioUtils) {
+    public MediaAudioAdapter(Context context, ArrayList<AudioUtil> audioUtils, boolean isList) {
         this.context = context;
         this.audioUtils = audioUtils;
+        this.isList = isList;
     }
 
     @Override
@@ -58,23 +56,25 @@ public class MediaAudioAdapter extends BaseAdapter {
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_audio, null);
-            else convertView = layoutInflater.inflate(R.layout.list_audio, null);
+            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_media, null);
         }
 
         ImageView imageView;
         TextView fileName;
 
         if(isList){
-            imageView = convertView.findViewById(R.id.audio_list_imaeg_view);
-            fileName = convertView.findViewById(R.id.audio_name_list);
+            imageView = convertView.findViewById(R.id.list_image_view);
+            fileName = convertView.findViewById(R.id.media_name_list);
             setupPopUp(convertView, position);
         }else {
-            imageView = convertView.findViewById(R.id.audio_grid_image_view);
-            fileName = convertView.findViewById(R.id.audio_name_grid);
-            TextView size = convertView.findViewById(R.id.audio_size);
+            imageView = convertView.findViewById(R.id.grid_image_view);
+            fileName = convertView.findViewById(R.id.media_name_grid);
+            TextView size = convertView.findViewById(R.id.media_size);
+
+            String size_string = getSize(audioUtils.get(position).getSize());
             size.setShadowLayer(2, 1, 1, Color.BLACK);
-            size.setText(audioUtils.get(position).getSize() + "");
+            size.setText(size_string);
         }
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
@@ -93,10 +93,22 @@ public class MediaAudioAdapter extends BaseAdapter {
         return convertView;
     }
 
+    @NotNull
+    private String getSize(int size){
+        float sizeFloat = (float) size / 1024;
+        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
+
+        if(sizeFloat < 1024) return sizeFloat + "KB";
+
+        sizeFloat = sizeFloat / 1024;
+        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
+        return sizeFloat + "MB";
+    }
+
     @SuppressLint("NonConstantResourceId")
     private void setupPopUp(View convertView, int position) {
 
-        ImageView imageView = convertView.findViewById(R.id.list_more_audio);
+        ImageView imageView = convertView.findViewById(R.id.list_more);
         imageView.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageView);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
@@ -104,13 +116,13 @@ public class MediaAudioAdapter extends BaseAdapter {
             popupMenu.setOnMenuItemClickListener(menuItem -> {
                 switch (menuItem.getItemId()){
                     case R.id.share:
-                        shareaudio(audioUtils.get(position).getUri());
+                        shareAudio(audioUtils.get(position).getUri());
                         break;
                     case R.id.open_with:
                         audioOpenWith(position);
                         break;
                     case R.id.file_info:
-                        infoaudio(position);
+                        infoAudio(position);
                         break;
                     case R.id.delete_permanent:
                         deleteToast();
@@ -144,6 +156,7 @@ public class MediaAudioAdapter extends BaseAdapter {
                 "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
         mToast.show();
     }
+
     private void deleteNoToast(String uri){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
@@ -160,7 +173,7 @@ public class MediaAudioAdapter extends BaseAdapter {
         context.startActivity(intent);
     }
 
-    private void shareaudio(String uri_string) {
+    private void shareAudio(String uri_string) {
 
         Uri uri = Uri.parse(uri_string);
         Intent sendIntent = new Intent();
@@ -174,7 +187,7 @@ public class MediaAudioAdapter extends BaseAdapter {
 
     }
 
-    private void infoaudio(int position) {
+    private void infoAudio(int position) {
 //        Intent intent = new Intent(context, audioInfoActivity.class);
 //        Bundle bundle = new Bundle();
 //

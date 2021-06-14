@@ -30,6 +30,7 @@ public class MediaDownloadActivity extends AppCompatActivity implements LoaderMa
     private GridView gridView;
     private ListView listView;
     private static final int LoaderManger_ID = 30;
+    private static final boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +63,18 @@ public class MediaDownloadActivity extends AppCompatActivity implements LoaderMa
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<DownloadUtils>> loader, ArrayList<DownloadUtils> data) {
-        gridView.setVisibility(View.VISIBLE);
-//        listView.setVisibility(View.VISIBLE);
+
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        MediaDownloadAdapter downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), data);
-        gridView.setAdapter(downloadAdapter);
-        //        listView.setAdapter(downloadAdapter);
+        MediaDownloadAdapter downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), data, isList);
+
+        if(isList){
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(downloadAdapter);
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(downloadAdapter);
+        }
     }
 
     @Override

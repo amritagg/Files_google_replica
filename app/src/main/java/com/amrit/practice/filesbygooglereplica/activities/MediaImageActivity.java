@@ -34,6 +34,7 @@ public class MediaImageActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 10;
     private ArrayList<ImageUtil> imageUtils;
+    private static final boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,14 +103,19 @@ public class MediaImageActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader, ArrayList<ImageUtil> data) {
 
-//        gridView.setVisibility(View.VISIBLE);
-        listView.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
+        MediaImageAdapter imageAdapter = new MediaImageAdapter(getApplicationContext(), data, isList);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        MediaImageAdapter imageAdapter = new MediaImageAdapter(getApplicationContext(), data);
-//        gridView.setAdapter(imageAdapter);
+        progressBar.setVisibility(View.GONE);
         imageUtils = data;
-        listView.setAdapter(imageAdapter);
+
+        if(isList){
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(imageAdapter);
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(imageAdapter);
+        }
+
     }
 
     @Override

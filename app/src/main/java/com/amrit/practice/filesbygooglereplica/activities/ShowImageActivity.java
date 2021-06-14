@@ -48,12 +48,6 @@ public class ShowImageActivity extends AppCompatActivity {
         delete = findViewById(R.id.image_delete);
         info = findViewById(R.id.image_info);
 
-//        View decorView = getWindow().getDecorView();
-        // Hide the status bar.
-//        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN; // & View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
-//        decorView.setSystemUiVisibility(uiOptions);
-        // Remember that you should never show the action bar if the
-        // status bar is hidden, so hide that too if necessary.
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.hide();
@@ -120,7 +114,6 @@ public class ShowImageActivity extends AppCompatActivity {
 
     @NotNull
     private String getSize(int size){
-        size /= 8;
         float sizeFloat = (float) size / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
 

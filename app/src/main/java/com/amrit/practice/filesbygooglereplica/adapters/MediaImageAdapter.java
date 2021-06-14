@@ -24,14 +24,15 @@ import java.util.Date;
 
 public class MediaImageAdapter extends BaseAdapter {
 
-    boolean isList = true;
+    private final boolean isList;
     private final ArrayList<ImageUtil> imageUtil;
     private final Context context;
     private Toast mToast;
 
-    public MediaImageAdapter(Context context, ArrayList<ImageUtil> imageUtil) {
+    public MediaImageAdapter(Context context, ArrayList<ImageUtil> imageUtil, boolean isList) {
         this.context = context;
         this.imageUtil = imageUtil;
+        this.isList = isList;
     }
 
     @Override
@@ -55,20 +56,20 @@ public class MediaImageAdapter extends BaseAdapter {
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_image, null);
-            else convertView = layoutInflater.inflate(R.layout.list_image, null);
+            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_media, null);
         }
 
         ImageView imageView;
 
         if(isList) {
-            imageView = convertView.findViewById(R.id.image_list_image_view);
-            TextView name = convertView.findViewById(R.id.file_name);
+            imageView = convertView.findViewById(R.id.list_image_view);
+            TextView name = convertView.findViewById(R.id.media_name_list);
             name.setText(imageUtil.get(position).getName());
             setUpPopUp(convertView, position);
         }else{
-            imageView = convertView.findViewById(R.id.image_grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.image_size);
+            imageView = convertView.findViewById(R.id.grid_image_view);
+            TextView sizeText = convertView.findViewById(R.id.media_size);
             sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
             int sizeInt = imageUtil.get(position).getSize();
             String sizeString = getSize(sizeInt);
@@ -77,7 +78,10 @@ public class MediaImageAdapter extends BaseAdapter {
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Uri contentUris = Uri.parse(imageUtil.get(position).getUri());
-        Glide.with(context).load(contentUris).into(imageView);
+        Glide.with(context)
+                .load(contentUris)
+                .placeholder(context.getDrawable(R.drawable.ic_baseline_image_24))
+                .into(imageView);
 
         return convertView;
     }
@@ -85,7 +89,7 @@ public class MediaImageAdapter extends BaseAdapter {
     @SuppressLint("NonConstantResourceId")
     private void setUpPopUp(View convertView, int position) {
 
-        ImageView imageMore = convertView.findViewById(R.id.list_more_image);
+        ImageView imageMore = convertView.findViewById(R.id.list_more);
         imageMore.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageMore);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
@@ -120,6 +124,7 @@ public class MediaImageAdapter extends BaseAdapter {
         });
 
     }
+
     private void deleteToast(){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
@@ -133,6 +138,7 @@ public class MediaImageAdapter extends BaseAdapter {
                 "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
         mToast.show();
     }
+
     private void deleteNoToast(String uri){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
@@ -166,13 +172,14 @@ public class MediaImageAdapter extends BaseAdapter {
     private void infoImage(int position) {
         Intent intent = new Intent(context, ImageInfoActivity.class);
         Bundle bundle = new Bundle();
+        String size_string = getSize(imageUtil.get(position).getSize());
 
         Date date = new Date(imageUtil.get(position).getDate() * 1000);
         bundle.putString("uri", imageUtil.get(position).getUri());
         bundle.putString("name", imageUtil.get(position).getName());
         bundle.putString("location", imageUtil.get(position).getLocation());
         bundle.putString("time", date.toString());
-        bundle.putString("size", getSize(imageUtil.get(position).getSize()));
+        bundle.putString("size", size_string);
         intent.putExtra("INFO", bundle);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
@@ -180,7 +187,6 @@ public class MediaImageAdapter extends BaseAdapter {
 
     @NotNull
     private String getSize(int size){
-        size /= 8;
         float sizeFloat = (float) size / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
 

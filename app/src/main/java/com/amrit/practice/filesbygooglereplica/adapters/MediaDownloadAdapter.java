@@ -21,13 +21,14 @@ import java.util.ArrayList;
 
 public class MediaDownloadAdapter extends BaseAdapter {
 
-    boolean isList = true;
+    private final boolean isList;
     private final ArrayList<DownloadUtils> downloadUtils;
     private final Context context;
 
-    public MediaDownloadAdapter(Context context, ArrayList<DownloadUtils> downloadUtils) {
+    public MediaDownloadAdapter(Context context, ArrayList<DownloadUtils> downloadUtils, boolean isList) {
         this.context = context;
         this.downloadUtils = downloadUtils;
+        this.isList = isList;
     }
 
     @Override
@@ -51,22 +52,27 @@ public class MediaDownloadAdapter extends BaseAdapter {
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_download, null);
-            else convertView = layoutInflater.inflate(R.layout.list_download, null);
+            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_media, null);
         }
 
         ImageView imageView;
 
         if(isList) {
-            imageView = convertView.findViewById(R.id.download_list_image_view);
-            TextView name = convertView.findViewById(R.id.file_name);
+            imageView = convertView.findViewById(R.id.list_image_view);
+
+            convertView.findViewById(R.id.list_more).setVisibility(View.GONE);
+
+            TextView name = convertView.findViewById(R.id.media_name_list);
             name.setText(downloadUtils.get(position).getName());
         }else{
-            imageView = convertView.findViewById(R.id.download_grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.download_size);
-            TextView name = convertView.findViewById(R.id.download_name_grid);
+            imageView = convertView.findViewById(R.id.grid_image_view);
+
+            TextView sizeText = convertView.findViewById(R.id.media_size);
+            TextView name = convertView.findViewById(R.id.media_name_grid);
             sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
-            int sizeInt = (int) downloadUtils.get(position).getSize();
+
+            int sizeInt = downloadUtils.get(position).getSize();
             name.setShadowLayer(2, 1, 1, Color.BLACK);
             name.setText(downloadUtils.get(position).getName());
             String sizeString = getSize(sizeInt);
@@ -85,7 +91,6 @@ public class MediaDownloadAdapter extends BaseAdapter {
 
     @NotNull
     private String getSize(int size){
-        size /= 8;
         float sizeFloat = (float) size / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
 

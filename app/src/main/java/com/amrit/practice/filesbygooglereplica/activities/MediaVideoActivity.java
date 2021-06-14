@@ -33,6 +33,7 @@ public class MediaVideoActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 20;
     private ArrayList<VideoUtil> videoUtils;
+    private final static boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,14 +91,19 @@ public class MediaVideoActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader, ArrayList<VideoUtil> data) {
-//        gridView.setVisibility(View.VISIBLE);
-        listView.setVisibility(View.VISIBLE);
-        progressBar.setVisibility(View.GONE);
-        Log.e(LOG_TAG, "Done onLoadFinished");
-        MediaVideoAdapter videoAdapter = new MediaVideoAdapter(data, getApplicationContext());
-//        gridView.setAdapter(videoAdapter);
+
+        MediaVideoAdapter videoAdapter = new MediaVideoAdapter(data, getApplicationContext(), isList);
         videoUtils = data;
-        listView.setAdapter(videoAdapter);
+        Log.e(LOG_TAG, "Done onLoadFinished");
+        progressBar.setVisibility(View.GONE);
+
+        if(isList){
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(videoAdapter);
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(videoAdapter);
+        }
     }
 
     @Override

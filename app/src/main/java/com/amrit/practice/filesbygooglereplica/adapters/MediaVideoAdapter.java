@@ -22,14 +22,15 @@ import java.util.ArrayList;
 
 public class MediaVideoAdapter extends BaseAdapter {
 
-    boolean isList = true;
     private final ArrayList<VideoUtil> videoUtil;
     private final Context context;
     private Toast mToast;
+    private final boolean isList;
 
-    public MediaVideoAdapter(ArrayList<VideoUtil> videoUtil, Context context) {
+    public MediaVideoAdapter(ArrayList<VideoUtil> videoUtil, Context context, boolean isList) {
         this.videoUtil = videoUtil;
         this.context = context;
+        this.isList = isList;
     }
 
     @Override
@@ -53,20 +54,20 @@ public class MediaVideoAdapter extends BaseAdapter {
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_video, null);
-            else convertView = layoutInflater.inflate(R.layout.list_video, null);
+            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_media, null);
         }
 
         ImageView imageView;
 
         if(isList) {
-            imageView = convertView.findViewById(R.id.video_list_image_view);
-            TextView name = convertView.findViewById(R.id.file_name);
+            imageView = convertView.findViewById(R.id.list_image_view);
+            TextView name = convertView.findViewById(R.id.media_name_list);
             name.setText(videoUtil.get(position).getName());
             setupPopup(convertView, position);
         }else{
-            imageView = convertView.findViewById(R.id.video_grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.video_size);
+            imageView = convertView.findViewById(R.id.grid_image_view);
+            TextView sizeText = convertView.findViewById(R.id.media_size);
             sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
             int sizeInt = videoUtil.get(position).getSize();
             String sizeString = getSize(sizeInt);
@@ -85,7 +86,7 @@ public class MediaVideoAdapter extends BaseAdapter {
 
     @SuppressLint("NonConstantResourceId")
     private void setupPopup(View convertView, int position) {
-        ImageView imageMore = convertView.findViewById(R.id.list_more_video);
+        ImageView imageMore = convertView.findViewById(R.id.list_more);
         imageMore.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageMore);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
@@ -180,7 +181,6 @@ public class MediaVideoAdapter extends BaseAdapter {
 
     @NotNull
     private String getSize(int size){
-        size /= 8;
         float sizeFloat = (float) size / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
 

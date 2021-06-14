@@ -32,6 +32,7 @@ public class MediaDocumentsActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 25;
     private ArrayList<DocumentsUtil> documentsUtils;
+    private final static boolean isList = false;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -75,14 +76,20 @@ public class MediaDocumentsActivity extends AppCompatActivity
 
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<DocumentsUtil>> loader, ArrayList<DocumentsUtil> data) {
-//        gridView.setVisibility(View.VISIBLE);
-        listView.setVisibility(View.VISIBLE);
+
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        MediaDocAdapter mediaDocAdapter = new MediaDocAdapter(getApplicationContext(), data);
-//        gridView.setAdapter(mediaDocAdapter);
-        listView.setAdapter(mediaDocAdapter);
+        MediaDocAdapter mediaDocAdapter = new MediaDocAdapter(getApplicationContext(), data, isList);
         documentsUtils = data;
+
+        if(isList){
+            listView.setVisibility(View.VISIBLE);
+            listView.setAdapter(mediaDocAdapter);
+        }else {
+            gridView.setVisibility(View.VISIBLE);
+            gridView.setAdapter(mediaDocAdapter);
+        }
+
     }
 
     @Override

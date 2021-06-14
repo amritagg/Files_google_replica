@@ -21,15 +21,16 @@ import java.util.ArrayList;
 
 public class MediaDocAdapter extends BaseAdapter {
 
-    private final static boolean isList = true;
+    private final boolean isList;
     private final Context context;
     private final ArrayList<DocumentsUtil> data;
     private Toast mToast;
     private static final String LOG_TAG = MediaDocAdapter.class.getSimpleName();
 
-    public MediaDocAdapter(Context context, ArrayList<DocumentsUtil> data) {
+    public MediaDocAdapter(Context context, ArrayList<DocumentsUtil> data, boolean isList) {
         this.context = context;
         this.data = data;
+        this.isList = isList;
     }
 
     @Override
@@ -54,20 +55,20 @@ public class MediaDocAdapter extends BaseAdapter {
         if(convertView == null){
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_doc, null);
-            else convertView = layoutInflater.inflate(R.layout.list_doc, null);
+            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
+            else convertView = layoutInflater.inflate(R.layout.list_media, null);
         }
 
         ImageView imageView;
 
         if(isList) {
-            imageView = convertView.findViewById(R.id.doc_list_image_view);
-            TextView name = convertView.findViewById(R.id.file_name);
+            imageView = convertView.findViewById(R.id.list_image_view);
+            TextView name = convertView.findViewById(R.id.media_name_list);
             name.setText(data.get(position).getName());
             setupPopUp(convertView, position);
         }else{
-            imageView = convertView.findViewById(R.id.doc_grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.doc_size);
+            imageView = convertView.findViewById(R.id.grid_image_view);
+            TextView sizeText = convertView.findViewById(R.id.media_size);
             sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
             String size_text = getSize((int) data.get(position).getSize());
             sizeText.setText(size_text);
@@ -81,7 +82,6 @@ public class MediaDocAdapter extends BaseAdapter {
 
     @NotNull
     private String getSize(int size){
-        size /= 8;
         float sizeFloat = (float) size / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
 
@@ -95,7 +95,7 @@ public class MediaDocAdapter extends BaseAdapter {
     @SuppressLint("NonConstantResourceId")
     private void setupPopUp(View convertView, int position) {
 
-        ImageView imageView = convertView.findViewById(R.id.list_more_doc);
+        ImageView imageView = convertView.findViewById(R.id.list_more);
         imageView.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageView);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
