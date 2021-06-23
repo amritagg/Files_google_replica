@@ -68,7 +68,7 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
                 int size = cursor.getInt(sizeColumn);
                 String name = cursor.getString(nameColumn);
                 Uri contentUri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-                long date = cursor.getInt(dateColumn);
+                long date = cursor.getLong(dateColumn);
                 String location = cursor.getString(locationColumn);
 
                ImageUtil imageUtil = new ImageUtil(contentUri.toString(), size, name, date, location);

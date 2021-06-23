@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,9 +16,11 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.activities.AudioInfoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MediaAudioAdapter extends BaseAdapter {
 
@@ -187,18 +190,20 @@ public class MediaAudioAdapter extends BaseAdapter {
     }
 
     private void infoAudio(int position) {
-//        Intent intent = new Intent(context, audioInfoActivity.class);
-//        Bundle bundle = new Bundle();
-//
-//        Date date = new Date(audioUtils.get(position).getDate() * 1000);
-//        bundle.putString("uri", audioUtil.get(position).getUri());
-//        bundle.putString("name", audioUtil.get(position).getName());
-//        bundle.putString("location", audioUtil.get(position).getLocation());
-//        bundle.putString("time", date.toString());
-//        bundle.putString("size", getSize(audioUtil.get(position).getSize()));
-//        intent.putExtra("INFO", bundle);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
+
+        Intent intent = new Intent(context, AudioInfoActivity.class);
+        Bundle bundle = new Bundle();
+
+        Date date = new Date(audioUtils.get(position).getDate()*1000);
+        bundle.putString("uri", audioUtils.get(position).getUri());
+        bundle.putString("name", audioUtils.get(position).getName());
+        bundle.putString("location", audioUtils.get(position).getLocation());
+        bundle.putString("time", date.toString());
+        bundle.putString("size", getSize(audioUtils.get(position).getSize()));
+        intent.putExtra("INFO", bundle);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+
     }
 
 }

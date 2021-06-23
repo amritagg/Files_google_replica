@@ -22,6 +22,7 @@ import com.amrit.practice.filesbygooglereplica.R;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class MediaAudioActivity extends AppCompatActivity
@@ -34,7 +35,7 @@ public class MediaAudioActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 15;
     private ArrayList<AudioUtil> audioUtil;
-    private final static boolean isList = false;
+    private final static boolean isList = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,14 +54,30 @@ public class MediaAudioActivity extends AppCompatActivity
 
     private final AdapterView.OnItemClickListener onItemClickListener = (adapterView, view, i, l) -> {
         Intent intent = new Intent(MediaAudioActivity.this, ShowAudioActivity.class);
-        ArrayList<String> imageUris = new ArrayList<>();
+        ArrayList<String> audioUris = new ArrayList<>();
+        ArrayList<String> audioNames = new ArrayList<>();
+        ArrayList<Integer> audioSize = new ArrayList<>();
+        ArrayList<String> audioLocation = new ArrayList<>();
+        ArrayList<Long> audioDate = new ArrayList<>();
 
         for(AudioUtil util: audioUtil) {
-            imageUris.add(util.getUri());
+            audioUris.add(util.getUri());
+            audioNames.add(util.getName());
+            audioSize.add(util.getSize());
+            audioLocation.add(util.getLocation());
+            audioDate.add(util.getDate());
         }
 
+        long[] audio_date = new long[audioDate.size()];
+
+        for(int j = 0; j < audioDate.size(); j++) audio_date[j] = audioDate.get(j);
+
         Bundle bundle = new Bundle();
-        bundle.putStringArrayList("uris", imageUris);
+        bundle.putStringArrayList("uris", audioUris);
+        bundle.putStringArrayList("location", audioLocation);
+        bundle.putStringArrayList("names", audioNames);
+        bundle.putIntegerArrayList("size", audioSize);
+        bundle.putLongArray("dates", audio_date);
 
         bundle.putInt("position", i);
         intent.putExtra("INFO", bundle);

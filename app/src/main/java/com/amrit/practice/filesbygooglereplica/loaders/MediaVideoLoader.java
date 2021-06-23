@@ -42,7 +42,9 @@ public class MediaVideoLoader extends AsyncTaskLoader<ArrayList<VideoUtil>> {
         String[] projection = new String[]{
                 MediaStore.Video.Media._ID,
                 MediaStore.Video.Media.DISPLAY_NAME,
-                MediaStore.Video.Media.SIZE
+                MediaStore.Video.Media.SIZE,
+                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.RELATIVE_PATH
         };
 
         try (Cursor cursor = context.getContentResolver().query(
@@ -50,20 +52,24 @@ public class MediaVideoLoader extends AsyncTaskLoader<ArrayList<VideoUtil>> {
                 projection,
                 null,
                 null,
-                MediaStore.Video.Media.DISPLAY_NAME + " ASC"
+                MediaStore.Video.Media.DATE_ADDED + " DESC"
         )) {
             assert cursor != null;
             int idColumn = cursor.getColumnIndex(MediaStore.Video.Media._ID);
             int sizeColumn = cursor.getColumnIndex(MediaStore.Video.Media.SIZE);
             int nameColumn = cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME);
+            int locationColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH);
+            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED);
 
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(idColumn);
                 int size = cursor.getInt(sizeColumn);
                 String name = cursor.getString(nameColumn);
                 Uri contentUri = ContentUris.withAppendedId(MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+                String location = cursor.getString(locationColumnIndex);
+                long date = cursor.getLong(dateColumnIndex);
 
-                VideoUtil videoUtil = new VideoUtil(contentUri.toString(), size, name);
+                VideoUtil videoUtil = new VideoUtil(contentUri.toString(), size, name, date, location);
                 list.add(videoUtil);
 
             }

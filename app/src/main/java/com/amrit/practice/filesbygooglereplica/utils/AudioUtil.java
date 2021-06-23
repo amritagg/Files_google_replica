@@ -8,12 +8,20 @@ public class AudioUtil {
     private final int size;
     private final String name;
     private final Bitmap bitmap;
+    private final long date;
+    private final String location;
 
-    public AudioUtil(String uri, int size, String name, Bitmap bitmap) {
+    public AudioUtil(String uri, int size, String name, Bitmap bitmap, String location, long date) {
         this.uri = uri;
         this.size = size;
         this.name = name;
         this.bitmap = bitmap;
+        this.location = location;
+        this.date = date;
+    }
+
+    public long getDate() {
+        return date;
     }
 
     public Bitmap getBitmap() {
@@ -30,6 +38,10 @@ public class AudioUtil {
 
     public String getName() {
         return name;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public static boolean isAudio(String name){

@@ -5,11 +5,23 @@ public class VideoUtil {
     private final String uri;
     private final int size;
     private final String name;
+    private final long date;
+    private final String location;
 
-    public VideoUtil(String uri, int size, String name) {
+    public VideoUtil(String uri, int size, String name, long date, String location) {
         this.uri = uri;
         this.size = size;
         this.name = name;
+        this.date = date;
+        this.location = location;
+    }
+
+    public long getDate() {
+        return date;
+    }
+
+    public String getLocation() {
+        return location;
     }
 
     public String getUri() {

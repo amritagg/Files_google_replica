@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +16,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.activities.AudioInfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.VideoInfoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MediaVideoAdapter extends BaseAdapter {
 
@@ -165,6 +169,20 @@ public class MediaVideoAdapter extends BaseAdapter {
     }
 
     private void infoVideo(int position) {
+
+        Intent intent = new Intent(context, VideoInfoActivity.class);
+        Bundle bundle = new Bundle();
+
+        Date date = new Date(videoUtil.get(position).getDate()*1000);
+        bundle.putString("uri", videoUtil.get(position).getUri());
+        bundle.putString("name", videoUtil.get(position).getName());
+        bundle.putString("location", videoUtil.get(position).getLocation());
+        bundle.putString("time", date.toString());
+        bundle.putString("size", getSize(videoUtil.get(position).getSize()));
+        intent.putExtra("INFO", bundle);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
+
 //        Intent intent = new Intent(context, videoInfoActivity.class);
 //        Bundle bundle = new Bundle();
 //

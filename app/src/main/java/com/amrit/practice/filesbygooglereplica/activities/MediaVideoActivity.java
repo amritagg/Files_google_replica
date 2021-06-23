@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,12 +13,10 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
 import com.amrit.practice.filesbygooglereplica.adapters.MediaVideoAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaVideoLoader;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
-
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
@@ -33,7 +30,7 @@ public class MediaVideoActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 20;
     private ArrayList<VideoUtil> videoUtils;
-    private final static boolean isList = false;
+    private final static boolean isList = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,17 +53,27 @@ public class MediaVideoActivity extends AppCompatActivity
         ArrayList<String> videoUri = new ArrayList<>();
         ArrayList<String> videoName = new ArrayList<>();
         ArrayList<Integer> videoSize = new ArrayList<>();
+        ArrayList<String> videoLocation = new ArrayList<>();
+        ArrayList<Long> videoDate = new ArrayList<>();
 
         for(VideoUtil util: videoUtils) {
             videoUri.add(util.getUri());
             videoName.add(util.getName());
             videoSize.add(util.getSize());
+            videoDate.add(util.getDate());
+            videoLocation.add(util.getLocation());
         }
+
+        long[] video_date = new long[videoDate.size()];
+
+        for(int j = 0; j < videoDate.size(); j++) video_date[j] = videoDate.get(j);
 
         Bundle bundle = new Bundle();
         bundle.putStringArrayList("video_uris", videoUri);
         bundle.putStringArrayList("video_name", videoName);
         bundle.putIntegerArrayList("video_size", videoSize);
+        bundle.putStringArrayList("video_location", videoLocation);
+        bundle.putLongArray("video_date", video_date);
 
         bundle.putInt("current_position", i);
         intent.putExtra("INFO", bundle);

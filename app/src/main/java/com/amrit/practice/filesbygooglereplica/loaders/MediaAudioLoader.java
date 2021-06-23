@@ -45,7 +45,9 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
         String[] projection = new String[]{
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.SIZE
+                MediaStore.Audio.Media.SIZE,
+                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.RELATIVE_PATH
         };
 
         try (Cursor cursor = context.getContentResolver().query(
@@ -59,12 +61,16 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
             int idColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
             int sizeColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.SIZE);
             int titleColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
+            int locationColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH);
+            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED);
 
             while (cursor.moveToNext()){
                 long id = cursor.getLong(idColumnIndex);
                 int size = cursor.getInt(sizeColumnIndex);
                 String title = cursor.getString(titleColumnIndex);
                 Uri contentUri = ContentUris.withAppendedId(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+                String location = cursor.getString(locationColumnIndex);
+                long date = cursor.getLong(dateColumnIndex);
 
                 AudioUtil audioUtil;
 
@@ -79,7 +85,7 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
                     Log.e(LOG_TAG, "Bitmap not available");
                 }
 
-                audioUtil = new AudioUtil(contentUri.toString(), size, title, bitmap);
+                audioUtil = new AudioUtil(contentUri.toString(), size, title, bitmap, location, date);
                 list.add(audioUtil);
             }
 

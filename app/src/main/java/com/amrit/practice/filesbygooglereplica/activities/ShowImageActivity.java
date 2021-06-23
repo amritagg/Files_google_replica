@@ -102,7 +102,7 @@ public class ShowImageActivity extends AppCompatActivity {
         Intent intent = new Intent(this, ImageInfoActivity.class);
         Bundle bundle = new Bundle();
 
-        Date date = new Date(image_date[n] *1000);
+        Date date = new Date(image_date[n]);
         bundle.putString("uri", image_uris.get(n));
         bundle.putString("name", image_names.get(n));
         bundle.putString("location", image_location.get(n));

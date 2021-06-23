@@ -3,18 +3,27 @@ package com.amrit.practice.filesbygooglereplica.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+
 import com.amrit.practice.filesbygooglereplica.R;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
+
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
+import java.util.Date;
 
 public class ShowAudioActivity extends AppCompatActivity {
 
     private SimpleExoPlayer player;
     private PlayerView playerView;
-    private ArrayList<String> audioUris;
+    private ArrayList<String> audioUris, audioLocations, audioNames;
+    private ArrayList<Integer> audioSize;
+    private long[] audio_dates;
     private int position;
     private boolean playWhenReady = true;
     private int currentWindow = 0;
@@ -26,10 +35,45 @@ public class ShowAudioActivity extends AppCompatActivity {
         setContentView(R.layout.activity_show_audio);
         playerView = findViewById(R.id.player_view);
 
+        Button share = findViewById(R.id.audio_share);
+        Button delete = findViewById(R.id.audio_delete);
+        Button info = findViewById(R.id.audio_info);
+
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra("INFO");
         audioUris = bundle.getStringArrayList("uris");
+        audio_dates = bundle.getLongArray("dates");
+        audioLocations = bundle.getStringArrayList("location");
+        audioNames = bundle.getStringArrayList("names");
+        audioSize = bundle.getIntegerArrayList("size");
         position = bundle.getInt("position");
+
+        info.setOnClickListener(view -> infoAudio());
+        delete.setOnClickListener(view -> deleteAudio());
+        share.setOnClickListener(view -> shareAudio());
+    }
+
+    private void shareAudio() {
+    }
+
+    private void deleteAudio() {
+    }
+
+    private void infoAudio() {
+
+        int n = position;
+        Intent intent = new Intent(this, AudioInfoActivity.class);
+        Bundle bundle = new Bundle();
+
+        Date date = new Date(audio_dates[n]*1000);
+        bundle.putString("uri", audioUris.get(n));
+        bundle.putString("name", audioNames.get(n));
+        bundle.putString("location", audioLocations.get(n));
+        bundle.putString("time", date.toString());
+        bundle.putString("size", getSize(audioSize.get(n)));
+        intent.putExtra("INFO", bundle);
+        startActivity(intent);
+
     }
 
     private void initializePlayer() {
@@ -78,4 +122,17 @@ public class ShowAudioActivity extends AppCompatActivity {
             player = null;
         }
     }
+
+    @NotNull
+    private String getSize(int size){
+        float sizeFloat = (float) size / 1024;
+        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
+
+        if(sizeFloat < 1024) return sizeFloat + "KB";
+
+        sizeFloat = sizeFloat / 1024;
+        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
+        return sizeFloat + "MB";
+    }
+
 }

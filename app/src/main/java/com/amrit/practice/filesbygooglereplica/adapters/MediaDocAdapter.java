@@ -72,6 +72,9 @@ public class MediaDocAdapter extends BaseAdapter {
             sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
             String size_text = getSize((int) data.get(position).getSize());
             sizeText.setText(size_text);
+            TextView name = convertView.findViewById(R.id.media_name_grid);
+            name.setText(data.get(position).getName());
+            name.setShadowLayer(2, 1, 1, Color.BLACK);
         }
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
