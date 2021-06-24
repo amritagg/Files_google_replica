@@ -6,13 +6,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
+import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.utils.DownloadUtils;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaDownloadAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaDownloadLoader;
@@ -30,7 +34,9 @@ public class MediaDownloadActivity extends AppCompatActivity implements LoaderMa
     private GridView gridView;
     private ListView listView;
     private static final int LoaderManger_ID = 30;
-    private static final boolean isList = false;
+    private static boolean isList = false;
+    private MediaDownloadAdapter downloadAdapter;
+    private ArrayList<DownloadUtils> downloadUtils;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +72,8 @@ public class MediaDownloadActivity extends AppCompatActivity implements LoaderMa
 
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        MediaDownloadAdapter downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), data, isList);
+        downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), data, isList);
+        downloadUtils = data;
 
         if(isList){
             listView.setVisibility(View.VISIBLE);
@@ -80,5 +87,32 @@ public class MediaDownloadActivity extends AppCompatActivity implements LoaderMa
     @Override
     public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<DownloadUtils>> loader) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.media_menu, menu);
+        return true;
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.list_grid){
+            isList = !isList;
+            downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), downloadUtils, isList);
+            if(isList) {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+                listView.setAdapter(downloadAdapter);
+                listView.setVisibility(View.VISIBLE);
+                gridView.setVisibility(View.GONE);
+            } else {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+                gridView.setAdapter(downloadAdapter);
+                listView.setVisibility(View.GONE);
+                gridView.setVisibility(View.VISIBLE);
+            }
+            return true;
+        }else return super.onOptionsItemSelected(item);
     }
 }

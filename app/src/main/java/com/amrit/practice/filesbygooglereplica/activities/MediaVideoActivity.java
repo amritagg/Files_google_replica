@@ -5,14 +5,20 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+
+import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaVideoAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaVideoLoader;
 import com.amrit.practice.filesbygooglereplica.R;
@@ -30,7 +36,8 @@ public class MediaVideoActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 20;
     private ArrayList<VideoUtil> videoUtils;
-    private final static boolean isList = true;
+    private static boolean isList = false;
+    private MediaVideoAdapter videoAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +106,7 @@ public class MediaVideoActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader, ArrayList<VideoUtil> data) {
 
-        MediaVideoAdapter videoAdapter = new MediaVideoAdapter(data, getApplicationContext(), isList);
+        videoAdapter = new MediaVideoAdapter(data, getApplicationContext(), isList);
         videoUtils = data;
         Log.e(LOG_TAG, "Done onLoadFinished");
         progressBar.setVisibility(View.GONE);
@@ -116,5 +123,32 @@ public class MediaVideoActivity extends AppCompatActivity
     @Override
     public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader) {
 
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.media_menu, menu);
+        return true;
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.list_grid){
+            isList = !isList;
+            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
+            if(isList) {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+                listView.setAdapter(videoAdapter);
+                listView.setVisibility(View.VISIBLE);
+                gridView.setVisibility(View.GONE);
+            } else {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+                gridView.setAdapter(videoAdapter);
+                listView.setVisibility(View.GONE);
+                gridView.setVisibility(View.VISIBLE);
+            }
+            return true;
+        }else return super.onOptionsItemSelected(item);
     }
 }

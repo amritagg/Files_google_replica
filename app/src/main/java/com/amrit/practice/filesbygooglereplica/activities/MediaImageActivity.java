@@ -6,9 +6,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -34,7 +37,8 @@ public class MediaImageActivity extends AppCompatActivity
     private ListView listView;
     private static final int LoaderManger_ID = 10;
     private ArrayList<ImageUtil> imageUtils;
-    private static final boolean isList = false;
+    private static boolean isList = false;
+    private MediaImageAdapter imageAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,7 +107,7 @@ public class MediaImageActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader, ArrayList<ImageUtil> data) {
 
-        MediaImageAdapter imageAdapter = new MediaImageAdapter(getApplicationContext(), data, isList);
+        imageAdapter = new MediaImageAdapter(getApplicationContext(), data, isList);
         Log.e(LOG_TAG, "Done onLoadFinished");
         progressBar.setVisibility(View.GONE);
         imageUtils = data;
@@ -120,4 +124,31 @@ public class MediaImageActivity extends AppCompatActivity
 
     @Override
     public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader) { }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.media_menu, menu);
+        return true;
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if(item.getItemId() == R.id.list_grid){
+            isList = !isList;
+            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
+            if(isList) {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+                listView.setAdapter(imageAdapter);
+                listView.setVisibility(View.VISIBLE);
+                gridView.setVisibility(View.GONE);
+            } else {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+                gridView.setAdapter(imageAdapter);
+                listView.setVisibility(View.GONE);
+                gridView.setVisibility(View.VISIBLE);
+            }
+            return true;
+        }else return super.onOptionsItemSelected(item);
+    }
 }
