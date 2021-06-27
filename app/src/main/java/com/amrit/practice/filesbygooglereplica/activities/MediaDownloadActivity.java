@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,18 +14,15 @@ import android.view.View;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
-import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.utils.DownloadUtils;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaDownloadAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaDownloadLoader;
 import com.amrit.practice.filesbygooglereplica.R;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 
-public class MediaDownloadActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<ArrayList<DownloadUtils>> {
+public class MediaDownloadActivity extends AppCompatActivity
+        implements LoaderManager.LoaderCallbacks<ArrayList<DownloadUtils>> {
 
     private final String LOG_TAG = MediaDownloadActivity.class.getSimpleName();
 
@@ -92,6 +88,8 @@ public class MediaDownloadActivity extends AppCompatActivity implements LoaderMa
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.media_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.sort_by);
+        menuItem.setVisible(false);
         return true;
     }
 

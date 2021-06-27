@@ -6,7 +6,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Build;
@@ -19,8 +18,6 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
-import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaDocAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaDocLoader;
@@ -107,6 +104,8 @@ public class MediaDocumentsActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.media_menu, menu);
+        MenuItem menuItem = menu.findItem(R.id.sort_by);
+        menuItem.setVisible(false);
         return true;
     }
 

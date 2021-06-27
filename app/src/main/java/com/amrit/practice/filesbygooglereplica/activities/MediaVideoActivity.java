@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -18,13 +17,14 @@ import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
+import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaVideoAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaVideoLoader;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MediaVideoActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<ArrayList<VideoUtil>> {
@@ -149,6 +149,46 @@ public class MediaVideoActivity extends AppCompatActivity
                 gridView.setVisibility(View.VISIBLE);
             }
             return true;
-        }else return super.onOptionsItemSelected(item);
+        } else if (item.getItemId() == R.id.sort_date){
+            ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
+
+            videoUtils.sort((videoUtil, t1) -> Long.compare(videoUtil.getDate(), t1.getDate()));
+
+            if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
+
+            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
+
+            if(isList) listView.setAdapter(videoAdapter);
+            else gridView.setAdapter(videoAdapter);
+
+            return true;
+        } else if (item.getItemId() == R.id.sort_name){
+            ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
+            videoUtils.sort((videoUtils, t1) -> videoUtils.getName().compareTo(t1.getName()));
+
+            if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
+
+            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
+
+            if(isList) listView.setAdapter(videoAdapter);
+            else gridView.setAdapter(videoAdapter);
+
+            return true;
+        } else if(item.getItemId() == R.id.sort_size){
+            ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
+
+            videoUtils.sort((videoUtils, t1) -> videoUtils.getSize() - t1.getSize());
+            if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
+
+            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
+
+            if(isList) listView.setAdapter(videoAdapter);
+            else gridView.setAdapter(videoAdapter);
+
+            return true;
+        } else if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        } else return super.onOptionsItemSelected(item);
     }
 }

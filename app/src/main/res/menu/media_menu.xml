@@ -20,6 +20,10 @@
 
             <item android:id="@+id/sort_date"
                 android:title="@string/by_date" />
+
+            <item android:id="@+id/sort_size"
+                android:title="@string/by_size" />
+
         </menu>
 
     </item>

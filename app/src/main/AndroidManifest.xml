@@ -16,8 +16,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".activities.VideoInfoActivity"></activity>
-        <activity android:name=".activities.AudioInfoActivity" />
         <activity android:name=".activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,46 +26,65 @@
         <activity
             android:name=".activities.MediaImageActivity"
             android:launchMode="singleTop"
+            android:label="Images"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowImageActivity"
             android:launchMode="singleTop"
+            android:label="Show Images"
             android:parentActivityName=".activities.MediaImageActivity" />
         <activity
             android:name=".activities.ImageInfoActivity"
             android:launchMode="singleTop"
+            android:label="Image Info"
             android:parentActivityName=".activities.ShowImageActivity" />
         <activity
             android:name=".activities.MediaAudioActivity"
             android:launchMode="singleTop"
+            android:label="Audios"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowAudioActivity"
             android:launchMode="singleTop"
+            android:label="Show Audio"
             android:parentActivityName=".activities.MediaAudioActivity" />
+        <activity android:name=".activities.AudioInfoActivity"
+            android:launchMode="singleTop"
+            android:label="Audio Info"
+            android:parentActivityName=".activities.ShowImageActivity" />
         <activity
             android:name=".activities.MediaVideoActivity"
             android:launchMode="singleTop"
+            android:label="Videos"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowVideoActivity"
             android:launchMode="singleTop"
+            android:label="Show Video"
             android:parentActivityName=".activities.MediaVideoActivity" />
+        <activity android:name=".activities.VideoInfoActivity"
+            android:launchMode="singleTop"
+            android:label="Video Info"
+            android:parentActivityName=".activities.ShowVideoActivity" />
         <activity
             android:name=".activities.MediaDownloadActivity"
             android:launchMode="singleTop"
+            android:label="Downloads"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.MediaDocumentsActivity"
             android:launchMode="singleTop"
+            android:label="Documents"
             android:parentActivityName=".activities.HomeActivity" />
         <activity
             android:name=".activities.ShowPdfActivity"
             android:launchMode="singleTop"
+            android:label="Show PDF"
             android:parentActivityName=".activities.MediaDocumentsActivity" />
         <activity
             android:name=".activities.InternalStorageActivity"
             android:launchMode="singleTop"
+            android:label="Internal Storage"
             android:parentActivityName=".activities.HomeActivity" />
     </application>
 

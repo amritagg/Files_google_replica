@@ -3,6 +3,7 @@ package com.amrit.practice.filesbygooglereplica.adapters;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.util.Log;
@@ -78,7 +79,9 @@ public class MediaDocAdapter extends BaseAdapter {
         }
 
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
+        Bitmap bitmap = data.get(position).getBitmap();
+        if(bitmap != null) imageView.setImageBitmap(bitmap);
+        else imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
 
         return convertView;
     }
@@ -146,6 +149,7 @@ public class MediaDocAdapter extends BaseAdapter {
                 "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
         mToast.show();
     }
+
     private void deleteNoToast(String uri){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
@@ -184,18 +188,6 @@ public class MediaDocAdapter extends BaseAdapter {
     }
 
     private void infoDocument(int position) {
-//        Intent intent = new Intent(context, docInfoActivity.class);
-//        Bundle bundle = new Bundle();
-//
-//        Date date = new Date(data.get(position).getDate() * 1000);
-//        bundle.putString("uri", data.get(position).getUri());
-//        bundle.putString("name", data.get(position).getName());
-//        bundle.putString("location", data.get(position).getLocation());
-//        bundle.putString("time", date.toString());
-//        bundle.putString("size", getSize(data.get(position).getSize()));
-//        intent.putExtra("INFO", bundle);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
     }
 
 }

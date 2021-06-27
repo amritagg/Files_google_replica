@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,15 +16,14 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaImageLoader;
 import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
-
 import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class MediaImageActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<ArrayList<ImageUtil>> {
@@ -149,6 +147,49 @@ public class MediaImageActivity extends AppCompatActivity
                 gridView.setVisibility(View.VISIBLE);
             }
             return true;
-        }else return super.onOptionsItemSelected(item);
+        } else if (item.getItemId() == R.id.sort_date){
+            ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
+            imageUtils.sort((imageUtil, t1) -> Long.compare(imageUtil.getDate(), t1.getDate()));
+
+            if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
+
+            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
+
+            if(isList) listView.setAdapter(imageAdapter);
+            else gridView.setAdapter(imageAdapter);
+
+            return true;
+        } else if (item.getItemId() == R.id.sort_name){
+            ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
+            imageUtils.sort((imageUtil, t1) -> imageUtil.getName().compareTo(t1.getName()));
+
+            if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
+
+            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
+
+            if(isList) listView.setAdapter(imageAdapter);
+            else gridView.setAdapter(imageAdapter);
+
+            return true;
+        } else if(item.getItemId() == R.id.sort_size){
+            ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
+
+            imageUtils.sort((imageUtil, t1) -> imageUtil.getSize() - t1.getSize());
+
+            if(imageUtils.equals(temp)) {
+                Log.e(LOG_TAG, "this happen");
+                Collections.reverse(imageUtils);
+            }
+
+            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
+
+            if(isList) listView.setAdapter(imageAdapter);
+            else gridView.setAdapter(imageAdapter);
+
+            return true;
+        } else if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        } else return super.onOptionsItemSelected(item);
     }
 }

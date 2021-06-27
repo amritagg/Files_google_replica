@@ -1,15 +1,23 @@
 package com.amrit.practice.filesbygooglereplica.utils;
 
+import android.graphics.Bitmap;
+
 public class DocumentsUtil {
 
     private String uri;
     private long size;
     private String name;
+    private final Bitmap bitmap;
 
-    public DocumentsUtil(String uri, long size, String name) {
+    public DocumentsUtil(String uri, long size, String name, Bitmap bitmap) {
         this.uri = uri;
         this.size = size;
         this.name = name;
+        this.bitmap = bitmap;
+    }
+
+    public Bitmap getBitmap(){
+        return bitmap;
     }
 
     public String getUri() {

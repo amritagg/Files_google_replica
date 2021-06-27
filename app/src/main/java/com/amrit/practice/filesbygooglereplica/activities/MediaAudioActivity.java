@@ -5,7 +5,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,17 +16,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-
-import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaAudioLoader;
 import com.amrit.practice.filesbygooglereplica.R;
-
 import org.jetbrains.annotations.NotNull;
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class MediaAudioActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<ArrayList<AudioUtil>> {
@@ -153,6 +148,44 @@ public class MediaAudioActivity extends AppCompatActivity
                 gridView.setVisibility(View.VISIBLE);
             }
             return true;
-        }else return super.onOptionsItemSelected(item);
+        } else if (item.getItemId() == R.id.sort_date) {
+            ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
+
+            audioUtil.sort((audioUtil, t1) -> Long.compare(audioUtil.getDate(), t1.getDate()));
+            if(audioUtil.equals(temp)) Collections.reverse(audioUtil);
+
+            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
+
+            if(isList) listView.setAdapter(audioAdapter);
+            else gridView.setAdapter(audioAdapter);
+
+            return true;
+        } else if (item.getItemId() == R.id.sort_name){
+            ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
+            audioUtil.sort((audioUtil, t1) -> audioUtil.getName().compareTo(t1.getName()));
+            if(audioUtil.equals(temp)) Collections.reverse(audioUtil);
+
+            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
+
+            if(isList) listView.setAdapter(audioAdapter);
+            else gridView.setAdapter(audioAdapter);
+
+            return true;
+        } else if(item.getItemId() == R.id.sort_size){
+            ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
+            audioUtil.sort((audioUtil, t1) -> audioUtil.getSize() - t1.getSize());
+
+            if(audioUtil.equals(temp)) Collections.reverse(audioUtil);
+
+            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
+
+            if(isList) listView.setAdapter(audioAdapter);
+            else gridView.setAdapter(audioAdapter);
+
+            return true;
+        } else if(item.getItemId() == android.R.id.home){
+            finish();
+            return true;
+        } else return super.onOptionsItemSelected(item);
     }
 }
