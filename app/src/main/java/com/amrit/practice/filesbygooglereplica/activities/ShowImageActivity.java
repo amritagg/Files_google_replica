@@ -3,7 +3,6 @@ package com.amrit.practice.filesbygooglereplica.activities;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.viewpager2.widget.CompositePageTransformer;
 import androidx.viewpager2.widget.MarginPageTransformer;
 import androidx.viewpager2.widget.ViewPager2;
@@ -11,12 +10,10 @@ import androidx.viewpager2.widget.ViewPager2;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
@@ -99,7 +96,7 @@ public class ShowImageActivity extends AppCompatActivity {
 
     private void infoImage() {
         int n = viewPager.getCurrentItem();
-        Intent intent = new Intent(this, ImageInfoActivity.class);
+        Intent intent = new Intent(this, InfoActivity.class);
         Bundle bundle = new Bundle();
 
         Date date = new Date(image_date[n]);

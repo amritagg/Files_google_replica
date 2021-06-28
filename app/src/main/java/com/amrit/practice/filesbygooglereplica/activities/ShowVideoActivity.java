@@ -60,7 +60,7 @@ public class ShowVideoActivity extends AppCompatActivity {
 
     private void infoVideo() {
         int n = position;
-        Intent intent = new Intent(this, VideoInfoActivity.class);
+        Intent intent = new Intent(this, InfoActivity.class);
         Bundle bundle = new Bundle();
 
         Date date = new Date(video_dates[n]*1000);

@@ -14,6 +14,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.adapters.InternalStorageAdapter;
@@ -34,6 +35,7 @@ public class InternalStorageActivity extends AppCompatActivity
     private ListView listView;
     private GridView gridView;
     private ProgressBar progressBar;
+    private TextView nothing;
     private static final int LOADER_ID = 35;
     private InternalStorageAdapter internalStorageAdapter;
     private ArrayList<InternalStorageUtil> utils;
@@ -50,6 +52,7 @@ public class InternalStorageActivity extends AppCompatActivity
         listView = findViewById(R.id.list_view_internal_Storage);
         gridView = findViewById(R.id.grid_view_internal_storage);
         progressBar = findViewById(R.id.internal_storage_progress_bar);
+        nothing = findViewById(R.id.nothing_internal_storage);
 
         progressBar.setVisibility(View.VISIBLE);
         visibleFileListParent = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
@@ -202,14 +205,20 @@ public class InternalStorageActivity extends AppCompatActivity
         Log.e(LOG_TAG, "Done onLoadFinished");
         utils = data;
 
-        if(isList){
-            listView.setVisibility(View.VISIBLE);
-            listView.setAdapter(internalStorageAdapter);
+        if(utils.size() == 0){
+            nothing.setVisibility(View.VISIBLE);
+            listView.setVisibility(View.GONE);
+            gridView.setVisibility(View.GONE);
         }else {
-            gridView.setVisibility(View.VISIBLE);
-            gridView.setAdapter(internalStorageAdapter);
+            nothing.setVisibility(View.GONE);
+            if (isList) {
+                listView.setVisibility(View.VISIBLE);
+                listView.setAdapter(internalStorageAdapter);
+            } else {
+                gridView.setVisibility(View.VISIBLE);
+                gridView.setAdapter(internalStorageAdapter);
+            }
         }
-
     }
 
     @Override

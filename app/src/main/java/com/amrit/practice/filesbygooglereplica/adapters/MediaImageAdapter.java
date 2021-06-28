@@ -15,7 +15,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.ImageInfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
@@ -170,7 +170,7 @@ public class MediaImageAdapter extends BaseAdapter {
     }
 
     private void infoImage(int position) {
-        Intent intent = new Intent(context, ImageInfoActivity.class);
+        Intent intent = new Intent(context, InfoActivity.class);
         Bundle bundle = new Bundle();
         String size_string = getSize(imageUtil.get(position).getSize());
 

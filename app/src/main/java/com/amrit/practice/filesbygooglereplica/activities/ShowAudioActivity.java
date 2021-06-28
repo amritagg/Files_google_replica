@@ -3,7 +3,6 @@ package com.amrit.practice.filesbygooglereplica.activities;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -62,7 +61,7 @@ public class ShowAudioActivity extends AppCompatActivity {
     private void infoAudio() {
 
         int n = position;
-        Intent intent = new Intent(this, AudioInfoActivity.class);
+        Intent intent = new Intent(this, InfoActivity.class);
         Bundle bundle = new Bundle();
 
         Date date = new Date(audio_dates[n]*1000);

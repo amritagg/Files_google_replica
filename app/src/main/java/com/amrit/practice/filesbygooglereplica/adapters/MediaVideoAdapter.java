@@ -16,8 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.AudioInfoActivity;
-import com.amrit.practice.filesbygooglereplica.activities.VideoInfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
@@ -170,7 +169,7 @@ public class MediaVideoAdapter extends BaseAdapter {
 
     private void infoVideo(int position) {
 
-        Intent intent = new Intent(context, VideoInfoActivity.class);
+        Intent intent = new Intent(context, InfoActivity.class);
         Bundle bundle = new Bundle();
 
         Date date = new Date(videoUtil.get(position).getDate()*1000);

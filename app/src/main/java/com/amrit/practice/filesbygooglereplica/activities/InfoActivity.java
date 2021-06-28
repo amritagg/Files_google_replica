@@ -4,17 +4,21 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Size;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amrit.practice.filesbygooglereplica.R;
 import com.bumptech.glide.Glide;
 
-public class ImageInfoActivity extends AppCompatActivity {
+import java.io.IOException;
 
-    @SuppressLint("SetTextI18n")
+public class InfoActivity extends AppCompatActivity {
+
+    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,9 +39,20 @@ public class ImageInfoActivity extends AppCompatActivity {
         String time_string = bundle.getString("time");
         String size_string = bundle.getString("size");
 
-        Glide.with(this)
-                .load(Uri.parse(uri_string))
-                .into(image);
+        try {
+            Bitmap bitmap = getContentResolver().loadThumbnail(
+                    Uri.parse(uri_string),
+                    new Size(200, 200),
+                    null
+            );
+            image.setImageBitmap(bitmap);
+        } catch (IOException e) {
+            image.setImageDrawable(getDrawable(R.drawable.ic_baseline_audiotrack_24));
+        }
+
+//        Glide.with(this)
+//                .load(Uri.parse(uri_string))
+//                .into(image);
 
         name.setText(name_string);
         location.setText(location_string + name_string);

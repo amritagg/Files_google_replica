@@ -16,7 +16,7 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.AudioInfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
@@ -191,7 +191,7 @@ public class MediaAudioAdapter extends BaseAdapter {
 
     private void infoAudio(int position) {
 
-        Intent intent = new Intent(context, AudioInfoActivity.class);
+        Intent intent = new Intent(context, InfoActivity.class);
         Bundle bundle = new Bundle();
 
         Date date = new Date(audioUtils.get(position).getDate()*1000);
