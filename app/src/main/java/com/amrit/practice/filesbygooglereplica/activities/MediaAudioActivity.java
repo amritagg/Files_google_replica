@@ -35,7 +35,7 @@ public class MediaAudioActivity extends AppCompatActivity
     private static final int LoaderManger_ID = 15;
     private ArrayList<AudioUtil> audioUtil;
     private MediaAudioAdapter audioAdapter;
-    private boolean isList = false;
+    private boolean isList  = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
