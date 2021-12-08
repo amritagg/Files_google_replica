@@ -10,80 +10,68 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.activities.MediaDocumentsActivity;
+import com.amrit.practice.filesbygooglereplica.activities.ShowPdfActivity;
 import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
-public class MediaDocAdapter extends BaseAdapter {
+public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaDocViewHolder> {
 
-    private final boolean isList;
     private final Context context;
     private final ArrayList<DocumentsUtil> data;
     private Toast mToast;
     private static final String LOG_TAG = MediaDocAdapter.class.getSimpleName();
 
-    public MediaDocAdapter(Context context, ArrayList<DocumentsUtil> data, boolean isList) {
+    public MediaDocAdapter(Context context, ArrayList<DocumentsUtil> data) {
         this.context = context;
         this.data = data;
-        this.isList = isList;
     }
 
+    @NonNull
     @Override
-    public int getCount() {
-        return data.size();
+    public MediaDocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutView.setLayoutParams(lp);
+
+        return new MediaDocViewHolder(layoutView);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
-    public Object getItem(int i) {
-        return getItemId(i);
-    }
+    public void onBindViewHolder(@NonNull MediaDocViewHolder holder, int position) {
+        holder.layout.setOnClickListener(view -> startImageActivity(position));
+        setupPopUp(holder, position);
+        holder.textName.setText(data.get(position).getName());
+        setupPopUp(holder, position);
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @SuppressLint({"InflateParams", "SetTextI18n", "UseCompatLoadingForDrawables"})
-    @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup) {
-
-        if(convertView == null){
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_view, null);
-        }
-
-        ImageView imageView;
-
-        if(isList) {
-            imageView = convertView.findViewById(R.id.list_image_view);
-            TextView name = convertView.findViewById(R.id.media_name_list);
-            name.setText(data.get(position).getName());
-            setupPopUp(convertView, position);
-        }else{
-            imageView = convertView.findViewById(R.id.grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.media_size);
-            sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
-            String size_text = getSize((int) data.get(position).getSize());
-            sizeText.setText(size_text);
-            TextView name = convertView.findViewById(R.id.media_name_grid);
-            name.setText(data.get(position).getName());
-            name.setShadowLayer(2, 1, 1, Color.BLACK);
-        }
-
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Bitmap bitmap = data.get(position).getBitmap();
-        if(bitmap != null) imageView.setImageBitmap(bitmap);
-        else imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
+        if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
+        else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
 
-        return convertView;
+    }
+
+    private void startImageActivity(int position) {
+        Intent intent = new Intent(context, ShowPdfActivity.class);
+            intent.putExtra("pdf_uri", data.get(position).getUri());
+            context.startActivity(intent);
+    }
+
+    @Override
+    public int getItemCount() {
+        return data.size();
     }
 
     @NotNull
@@ -99,11 +87,10 @@ public class MediaDocAdapter extends BaseAdapter {
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void setupPopUp(View convertView, int position) {
+    private void setupPopUp(MediaDocViewHolder convertView, int position) {
 
-        ImageView imageView = convertView.findViewById(R.id.list_more);
-        imageView.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageView);
+        convertView.list_more.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), convertView.list_more);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -190,4 +177,52 @@ public class MediaDocAdapter extends BaseAdapter {
     private void infoDocument(int position) {
     }
 
+    public static class MediaDocViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView imageView;
+        TextView textName;
+        ImageView list_more;
+        LinearLayout layout;
+
+        public MediaDocViewHolder(@NonNull View itemView) {
+            super(itemView);
+            imageView = itemView.findViewById(R.id.list_image_view);
+            textName = itemView.findViewById(R.id.media_name_list);
+            list_more = itemView.findViewById(R.id.list_more);
+            layout = itemView.findViewById(R.id.list_linearLayout);
+        }
+    }
+
 }
+
+/*
+ @SuppressLint({"InflateParams", "SetTextI18n", "UseCompatLoadingForDrawables"})
+    @Override
+    public View getView(int position, View convertView, ViewGroup viewGroup) {
+
+        ImageView imageView;
+
+        if(isList) {
+            imageView = convertView.findViewById(R.id.list_image_view);
+            TextView name = convertView.findViewById(R.id.media_name_list);
+            name.setText(data.get(position).getName());
+            setupPopUp(convertView, position);
+        }else{
+            imageView = convertView.findViewById(R.id.grid_image_view);
+            TextView sizeText = convertView.findViewById(R.id.media_size);
+            sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
+            String size_text = getSize((int) data.get(position).getSize());
+            sizeText.setText(size_text);
+            TextView name = convertView.findViewById(R.id.media_name_grid);
+            name.setText(data.get(position).getName());
+            name.setShadowLayer(2, 1, 1, Color.BLACK);
+        }
+
+        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Bitmap bitmap = data.get(position).getBitmap();
+        if(bitmap != null) imageView.setImageBitmap(bitmap);
+        else imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
+
+        return convertView;
+    }
+* */

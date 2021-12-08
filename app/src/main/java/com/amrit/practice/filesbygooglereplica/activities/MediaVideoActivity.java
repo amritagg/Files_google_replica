@@ -5,16 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
 import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
@@ -25,6 +25,7 @@ import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class MediaVideoActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<ArrayList<VideoUtil>> {
@@ -32,60 +33,20 @@ public class MediaVideoActivity extends AppCompatActivity
     private final String LOG_TAG = MediaVideoActivity.class.getSimpleName();
 
     private ProgressBar progressBar;
-    private GridView gridView;
-    private ListView listView;
+    private RecyclerView recyclerView;
     private static final int LoaderManger_ID = 20;
     private ArrayList<VideoUtil> videoUtils;
-    private static boolean isList = false;
     private MediaVideoAdapter videoAdapter;
+    private boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        progressBar = findViewById(R.id.media_progress_bar);
-        gridView = findViewById(R.id.media_grid_view);
-        listView = findViewById(R.id.media_list_view);
-
+        initialiseRecyclerView();
         showVideos();
-
-        gridView.setOnItemClickListener(onItemClickListener);
-        listView.setOnItemClickListener(onItemClickListener);
-
     }
-
-    private final AdapterView.OnItemClickListener onItemClickListener = (adapterView, view, i, l) -> {
-        Intent intent = new Intent(MediaVideoActivity.this, ShowVideoActivity.class);
-        ArrayList<String> videoUri = new ArrayList<>();
-        ArrayList<String> videoName = new ArrayList<>();
-        ArrayList<Integer> videoSize = new ArrayList<>();
-        ArrayList<String> videoLocation = new ArrayList<>();
-        ArrayList<Long> videoDate = new ArrayList<>();
-
-        for(VideoUtil util: videoUtils) {
-            videoUri.add(util.getUri());
-            videoName.add(util.getName());
-            videoSize.add(util.getSize());
-            videoDate.add(util.getDate());
-            videoLocation.add(util.getLocation());
-        }
-
-        long[] video_date = new long[videoDate.size()];
-
-        for(int j = 0; j < videoDate.size(); j++) video_date[j] = videoDate.get(j);
-
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList("video_uris", videoUri);
-        bundle.putStringArrayList("video_name", videoName);
-        bundle.putIntegerArrayList("video_size", videoSize);
-        bundle.putStringArrayList("video_location", videoLocation);
-        bundle.putLongArray("video_date", video_date);
-
-        bundle.putInt("current_position", i);
-        intent.putExtra("INFO", bundle);
-        startActivity(intent);
-    };
 
     private void showVideos(){
         LoaderManager loaderManager = LoaderManager.getInstance(this);
@@ -96,34 +57,25 @@ public class MediaVideoActivity extends AppCompatActivity
     @NotNull
     @Override
     public Loader<ArrayList<VideoUtil>> onCreateLoader(int id, @Nullable @org.jetbrains.annotations.Nullable Bundle args) {
-        gridView.setVisibility(View.GONE);
-        listView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
         Log.e(LOG_TAG, "started onLoadFinished");
         return new MediaVideoLoader(getApplicationContext());
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader, ArrayList<VideoUtil> data) {
 
-        videoAdapter = new MediaVideoAdapter(data, getApplicationContext(), isList);
-        videoUtils = data;
         Log.e(LOG_TAG, "Done onLoadFinished");
+        videoUtils.addAll(data);
         progressBar.setVisibility(View.GONE);
-
-        if(isList){
-            listView.setVisibility(View.VISIBLE);
-            listView.setAdapter(videoAdapter);
-        }else {
-            gridView.setVisibility(View.VISIBLE);
-            gridView.setAdapter(videoAdapter);
-        }
+        recyclerView.setVisibility(View.VISIBLE);
+        videoAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader) {
-
-    }
+    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader) { }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -131,64 +83,73 @@ public class MediaVideoActivity extends AppCompatActivity
         return true;
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.list_grid){
-            isList = !isList;
-            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
-            if(isList) {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
-                listView.setAdapter(videoAdapter);
-                listView.setVisibility(View.VISIBLE);
-                gridView.setVisibility(View.GONE);
-            } else {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
-                gridView.setAdapter(videoAdapter);
-                listView.setVisibility(View.GONE);
-                gridView.setVisibility(View.VISIBLE);
-            }
-            return true;
-        } else if (item.getItemId() == R.id.sort_date){
+        if(item.getItemId() == R.id.sort_date){
             ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
-
-            videoUtils.sort((videoUtil, t1) -> Long.compare(videoUtil.getDate(), t1.getDate()));
+            videoUtils.sort(Comparator.comparingLong(VideoUtil::getDate));
 
             if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
-
-            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
-
-            if(isList) listView.setAdapter(videoAdapter);
-            else gridView.setAdapter(videoAdapter);
+            videoAdapter.notifyDataSetChanged();
 
             return true;
-        } else if (item.getItemId() == R.id.sort_name){
+        }else if (item.getItemId() == R.id.sort_name){
             ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
-            videoUtils.sort((videoUtils, t1) -> videoUtils.getName().compareTo(t1.getName()));
+            videoUtils.sort(Comparator.comparing(VideoUtil::getName));
 
             if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
-
-            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
-
-            if(isList) listView.setAdapter(videoAdapter);
-            else gridView.setAdapter(videoAdapter);
+            videoAdapter.notifyDataSetChanged();
 
             return true;
-        } else if(item.getItemId() == R.id.sort_size){
+        }else if(item.getItemId() == R.id.sort_size){
             ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
+            videoUtils.sort(Comparator.comparingInt(VideoUtil::getSize));
 
-            videoUtils.sort((videoUtils, t1) -> videoUtils.getSize() - t1.getSize());
             if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
-
-            videoAdapter = new MediaVideoAdapter(videoUtils, getApplicationContext(), isList);
-
-            if(isList) listView.setAdapter(videoAdapter);
-            else gridView.setAdapter(videoAdapter);
+            videoAdapter.notifyDataSetChanged();
 
             return true;
-        } else if(item.getItemId() == android.R.id.home){
+        } else if(item.getItemId() == android.R.id.home) {
             finish();
             return true;
-        } else return super.onOptionsItemSelected(item);
+        }else if(item.getItemId() == R.id.list_grid){
+            RecyclerView.LayoutManager layoutManager;
+
+            if(isList){
+                layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+            }else{
+                layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+            }
+            recyclerView.setLayoutManager(layoutManager);
+            isList = !isList;
+            videoAdapter = new MediaVideoAdapter(this, videoUtils, isList);
+            recyclerView.setAdapter(videoAdapter);
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
+    private void initialiseRecyclerView() {
+        progressBar = findViewById(R.id.media_progress_bar);
+        recyclerView = findViewById(R.id.media_recycler_view);
+        recyclerView.setVisibility(View.GONE);
+        videoUtils = new ArrayList<>();
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(false);
+        RecyclerView.LayoutManager layoutManager;
+        if(isList){
+            layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        }else{
+            layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        }
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
+        videoAdapter = new MediaVideoAdapter(this, videoUtils, isList);
+        recyclerView.setAdapter(videoAdapter);
+    }
+
 }

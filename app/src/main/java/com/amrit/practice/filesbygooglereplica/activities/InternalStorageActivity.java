@@ -5,9 +5,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
@@ -18,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.adapters.InternalStorageAdapter;
+import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.InternalStorageLoader;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
@@ -42,7 +46,7 @@ public class InternalStorageActivity extends AppCompatActivity
     private File visibleFileListParent;
     private LoaderManager loaderManager;
     private String HEAD_FILE;
-    private final static boolean isList = true;
+    private static boolean isList = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -237,15 +241,39 @@ public class InternalStorageActivity extends AppCompatActivity
     }
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.media_menu, menu);
+        return true;
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if(item.getItemId() == android.R.id.home){
             if(visibleFileListParent.getAbsolutePath().equals(HEAD_FILE)){
                 finish();
+                return true;
             }else {
                 visibleFileListParent = visibleFileListParent.getParentFile();
                 showFiles(1);
                 return true;
             }
+        }else if(item.getItemId() == R.id.list_grid){
+            isList = !isList;
+            internalStorageAdapter = new InternalStorageAdapter(this, utils, isList);
+
+            if(isList) {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+                listView.setAdapter(internalStorageAdapter);
+                listView.setVisibility(View.VISIBLE);
+                gridView.setVisibility(View.GONE);
+            } else {
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+                gridView.setAdapter(internalStorageAdapter);
+                listView.setVisibility(View.GONE);
+                gridView.setVisibility(View.VISIBLE);
+            }
+            return true;
         }
         return super.onOptionsItemSelected(item);
     }

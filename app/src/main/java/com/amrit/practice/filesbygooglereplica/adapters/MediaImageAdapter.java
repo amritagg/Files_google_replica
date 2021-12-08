@@ -9,25 +9,32 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.ShowImageActivity;
 import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
 import com.bumptech.glide.Glide;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MediaImageAdapter extends BaseAdapter {
+public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.MediaImageViewHolder>{
 
-    private final boolean isList;
     private final ArrayList<ImageUtil> imageUtil;
     private final Context context;
     private Toast mToast;
+    private final boolean isList;
 
     public MediaImageAdapter(Context context, ArrayList<ImageUtil> imageUtil, boolean isList) {
         this.context = context;
@@ -35,63 +42,90 @@ public class MediaImageAdapter extends BaseAdapter {
         this.isList = isList;
     }
 
+    @SuppressLint("InflateParams")
+    @NonNull
     @Override
-    public int getCount() {
-        return imageUtil.size();
-    }
-
-    @Override
-    public Object getItem(int position) {
-        return getItemId(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
-
-    @SuppressLint({"ViewHolder", "InflateParams", "UseCompatLoadingForDrawables", "SetTextI18n"})
-    @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup) {
-        if(convertView == null){
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_view, null);
-        }
-
-        ImageView imageView;
-
-        if(isList) {
-            imageView = convertView.findViewById(R.id.list_image_view);
-            TextView name = convertView.findViewById(R.id.media_name_list);
-            name.setText(imageUtil.get(position).getName());
-            setUpPopUp(convertView, position);
+    public MediaImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View layoutView;
+        if(isList){
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
         }else{
-            imageView = convertView.findViewById(R.id.grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.media_size);
-            sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_media, null, false);
+        }
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutView.setLayoutParams(lp);
+
+        return new MediaImageViewHolder(layoutView, isList);
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
+    public void onBindViewHolder(@NonNull MediaImageViewHolder holder, int position) {
+        if(isList){
+            setUpPopUp(holder, position);
+            holder.linear.setOnClickListener(view -> startImageActivity(position));
+        }else{
+            holder.mediaName.setShadowLayer(2, 1, 1, Color.BLACK);
+            holder.mediaSize.setShadowLayer(2, 1, 1, Color.BLACK);
             int sizeInt = imageUtil.get(position).getSize();
             String sizeString = getSize(sizeInt);
-            sizeText.setText(sizeString);
+            holder.mediaSize.setText(sizeString);
+            holder.relative.setOnClickListener(view -> startImageActivity(position));
         }
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Uri contentUris = Uri.parse(imageUtil.get(position).getUri());
         Glide.with(context)
                 .load(contentUris)
                 .placeholder(context.getDrawable(R.drawable.ic_baseline_image_24))
-                .into(imageView);
+                .into(holder.imageView);
+        holder.mediaName.setText(imageUtil.get(position).getName());
 
-        return convertView;
+    }
+
+    @Override
+    public int getItemCount() {
+        return imageUtil.size();
+    }
+
+    private void startImageActivity(int position){
+        Intent intent = new Intent(context, ShowImageActivity.class);
+        ArrayList<String> imageUris = new ArrayList<>();
+        ArrayList<String> imageName = new ArrayList<>();
+        ArrayList<Integer> imageSize = new ArrayList<>();
+        ArrayList<Long> imageDate = new ArrayList<>();
+        ArrayList<String> imageLocation = new ArrayList<>();
+
+        for(ImageUtil util: imageUtil) {
+            imageUris.add(util.getUri());
+            imageName.add(util.getName());
+            imageSize.add(util.getSize());
+            imageDate.add(util.getDate());
+            imageLocation.add(util.getLocation());
+        }
+
+        long[] longList = new long[imageDate.size()];
+
+        for(int j = 0; j < imageDate.size(); j++) longList[j] = imageDate.get(j);
+
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("image_uris", imageUris);
+        bundle.putStringArrayList("image_name", imageName);
+        bundle.putIntegerArrayList("image_size", imageSize);
+        bundle.putLongArray("image_date", longList);
+        bundle.putStringArrayList("image_location", imageLocation);
+
+        bundle.putInt("current_position", position);
+        intent.putExtra("bundle", bundle);
+
+        context.startActivity(intent);
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void setUpPopUp(View convertView, int position) {
+    private void setUpPopUp(MediaImageViewHolder holder, int position) {
 
-        ImageView imageMore = convertView.findViewById(R.id.list_more);
-        imageMore.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageMore);
+        holder.listMore.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.listMore);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -166,7 +200,6 @@ public class MediaImageAdapter extends BaseAdapter {
         Intent shareIntent = Intent.createChooser(sendIntent, null);
         shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(shareIntent);
-
     }
 
     private void infoImage(int position) {
@@ -195,6 +228,31 @@ public class MediaImageAdapter extends BaseAdapter {
         sizeFloat = sizeFloat / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
         return sizeFloat + "MB";
+    }
+
+    public static class MediaImageViewHolder extends RecyclerView.ViewHolder {
+
+        ImageView imageView;
+        ImageView listMore;
+        TextView mediaName;
+        TextView mediaSize;
+        LinearLayout linear;
+        RelativeLayout relative;
+
+        public MediaImageViewHolder(@NonNull View itemView, boolean isList) {
+            super(itemView);
+            if(isList){
+                imageView = itemView.findViewById(R.id.list_image_view);
+                mediaName = itemView.findViewById(R.id.media_name_list);
+                linear = itemView.findViewById(R.id.list_linearLayout);
+                listMore = itemView.findViewById(R.id.list_more);
+            }else{
+                imageView = itemView.findViewById(R.id.grid_image_view);
+                mediaName = itemView.findViewById(R.id.media_name_grid);
+                mediaSize = itemView.findViewById(R.id.media_size);
+                relative = itemView.findViewById(R.id.grid_layout);
+            }
+        }
     }
 
 }

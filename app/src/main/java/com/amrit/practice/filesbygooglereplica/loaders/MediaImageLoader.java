@@ -20,12 +20,14 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
     private final Context context;
     private final String LOG_TAG = MediaImageLoader.class.getSimpleName();
 
+    // constructor for the imageloader
     public MediaImageLoader(@NonNull @NotNull Context context) {
         super(context);
         this.context = context;
         Log.e(LOG_TAG, "background called");
     }
 
+    // starting of background task
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
@@ -33,6 +35,7 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
         forceLoad();
     }
 
+    // during background task
     @Nullable
     @Override
     public ArrayList<ImageUtil> loadInBackground() {
@@ -41,6 +44,7 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
 
         ArrayList<ImageUtil> list = new ArrayList<>();
 
+        // details required for imagefile
         String[] projection = new String[]{
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
@@ -49,6 +53,7 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
                 MediaStore.Images.Media.RELATIVE_PATH
         };
 
+        // staring the cursor
         try (Cursor cursor = context.getContentResolver().query(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -71,6 +76,7 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
                 long date = cursor.getLong(dateColumn);
                 String location = cursor.getString(locationColumn);
 
+                // adding the details in list
                ImageUtil imageUtil = new ImageUtil(contentUri.toString(), size, name, date, location);
                list.add(imageUtil);
 

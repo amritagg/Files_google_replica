@@ -24,17 +24,20 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
     private final String LOG_TAG = MediaDocLoader.class.getSimpleName();
     private final Context context;
 
+    // constructor for docloader
     public MediaDocLoader(@NonNull @NotNull Context context) {
         super(context);
         this.context = context;
     }
 
+    // starting the background task
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
         forceLoad();
     }
 
+    // during the background task
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
@@ -42,6 +45,7 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
 
         ArrayList<DocumentsUtil> list = new ArrayList<>();
 
+        // getting home file from current file
         File file = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
                 context.getExternalFilesDir(null) // /storage/emulated/0/Android/data/com.amrit.practice.filesByGoogleReplica/files
                 .getParentFile()) // /storage/emulated/0/Android/data/com.amrit.practice.filesByGoogleReplica
@@ -54,7 +58,11 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
         assert file != null;
         ArrayList<File> getAllFiles = new ArrayList<>();
         for(File f: Objects.requireNonNull(file.listFiles())){
+
+            // ignroing docs from android folder
             if(!f.getName().equals("Android")){
+
+                // if it is folder then check for all files
                 if(f.isDirectory()){
                     getAllFiles.addAll(getDocumentFiles(Objects.requireNonNull(f.listFiles())));
                 }else{
@@ -70,12 +78,14 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
             }
         }
 
+        // loading thumbnail for pdf files
         for(File f: getAllFiles){
             if(!f.getAbsolutePath().equals("/storage/emulated/0")){
                 String name = f.getName();
                 long size = f.length();
                 String uri = Uri.parse(f.getAbsolutePath()).toString();
 
+                // creating the file
                 File temp = new File(uri);
                 ParcelFileDescriptor pdf;
                 PdfRenderer pdfRenderer;
@@ -86,6 +96,7 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
 
                     PdfRenderer.Page page = pdfRenderer.openPage(0);
 
+                    // getting bitmap
                     bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
 
                     page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
@@ -95,6 +106,7 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
                     e.printStackTrace();
                 }
 
+                // adding details in list
                 DocumentsUtil documentsUtil = new DocumentsUtil(uri, size, name, bitmap);
                 list.add(documentsUtil);
             }

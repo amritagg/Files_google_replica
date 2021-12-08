@@ -4,11 +4,13 @@ import android.graphics.Bitmap;
 
 public class DocumentsUtil {
 
+    //  Required Params for the Document Files
     private String uri;
     private long size;
     private String name;
     private final Bitmap bitmap;
 
+    // Constructor for the same
     public DocumentsUtil(String uri, long size, String name, Bitmap bitmap) {
         this.uri = uri;
         this.size = size;
@@ -16,6 +18,7 @@ public class DocumentsUtil {
         this.bitmap = bitmap;
     }
 
+    // Getters to get the values
     public Bitmap getBitmap(){
         return bitmap;
     }

@@ -9,8 +9,6 @@
     <string name="storage_devices">Storage Devices</string>
     <string name="internal_storage">Internal Storage</string>
     <string name="title_activity_media">MediaActivity</string>
-    <string name="tab_text_1">Tab 1</string>
-    <string name="tab_text_2">Tab 2</string>
     <string name="fab">FAB</string>
     <string name="nothing_found_in_this_folder">Nothing Found in this folder..!!</string>
     <string name="list_image_view">list image view</string>
@@ -24,13 +22,11 @@
     <string name="delete_permanently">Delete Permanently</string>
     <string name="yes">Yes!!</string>
     <string name="no">No..</string>
-    <string name="title_activity_temp">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
     <string name="pdf">PDF</string>
     <string name="list_grid">List Grid</string>
     <string name="sort_by">Sort By</string>
     <string name="by_name">By Name</string>
     <string name="by_date">By Date</string>
     <string name="by_size">By Size</string>
+    <string name="open_camera">Open camera</string>
 </resources>

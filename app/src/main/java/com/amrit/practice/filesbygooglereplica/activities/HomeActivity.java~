@@ -38,10 +38,10 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-//        download.setOnClickListener(view -> {
-//            Intent intent = new Intent(HomeActivity.this, MediaDownloadActivity.class);
-//            startActivity(intent);
-//        });
+        download.setOnClickListener(view -> {
+            Intent intent = new Intent(HomeActivity.this, MediaDownloadActivity.class);
+            startActivity(intent);
+        });
 
         images.setOnClickListener(view -> {
             Intent intent = new Intent(HomeActivity.this, MediaImageActivity.class);
@@ -58,10 +58,10 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-//        documents.setOnClickListener(view -> {
-//            Intent intent = new Intent(HomeActivity.this, MediaDocumentsActivity.class);
-//            startActivity(intent);
-//        });
+        documents.setOnClickListener(view -> {
+            Intent intent = new Intent(HomeActivity.this, MediaDocumentsActivity.class);
+            startActivity(intent);
+        });
 
     }
 

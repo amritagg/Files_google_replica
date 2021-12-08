@@ -2,13 +2,15 @@ package com.amrit.practice.filesbygooglereplica.utils;
 
 public class DownloadUtils {
 
+    //  Required Params for the Download Files
     private String uri;
-    private int size;
+    private long size;
     private String name;
-    private long date;
+    private String date;
     private final String location;
 
-    public DownloadUtils(String uri, int size, String name, long date, String location) {
+    // Constructor for the same
+    public DownloadUtils(String uri, long size, String name, String date, String location) {
         this.uri = uri;
         this.size = size;
         this.name = name;
@@ -16,6 +18,7 @@ public class DownloadUtils {
         this.location = location;
     }
 
+    // Getters to get the values
     public String getUri() {
         return uri;
     }
@@ -24,7 +27,7 @@ public class DownloadUtils {
         this.uri = uri;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
@@ -40,11 +43,11 @@ public class DownloadUtils {
         this.name = name;
     }
 
-    public long getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(long date) {
+    public void setDate(String date) {
         this.date = date;
     }
 

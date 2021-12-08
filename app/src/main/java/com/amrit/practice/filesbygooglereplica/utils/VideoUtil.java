@@ -2,12 +2,14 @@ package com.amrit.practice.filesbygooglereplica.utils;
 
 public class VideoUtil {
 
+    //  Required Params for the Video Files
     private final String uri;
     private final int size;
     private final String name;
     private final long date;
     private final String location;
 
+    // Constructor the same
     public VideoUtil(String uri, int size, String name, long date, String location) {
         this.uri = uri;
         this.size = size;
@@ -16,6 +18,7 @@ public class VideoUtil {
         this.location = location;
     }
 
+    // Getters to get the values
     public long getDate() {
         return date;
     }

@@ -17,29 +17,15 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
 
-    <ListView
-        android:id="@+id/media_list_view"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/media_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/list_view"/>
-
-    <GridView
-        android:id="@+id/media_grid_view"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:numColumns="2"
-        android:horizontalSpacing="2dp"
-        android:verticalSpacing="2dp"
-        android:visibility="gone"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:listitem="@layout/grid_media"/>
+        tools:listitem="@layout/list_media" />
 
     <ProgressBar
         android:id="@+id/media_progress_bar"

@@ -5,18 +5,19 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaImageLoader;
 import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
@@ -29,62 +30,20 @@ public class MediaImageActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<ArrayList<ImageUtil>> {
 
     private final String LOG_TAG = MediaImageActivity.class.getSimpleName();
-
     private ProgressBar progressBar;
-    private GridView gridView;
-    private ListView listView;
+    private RecyclerView recyclerView;
     private static final int LoaderManger_ID = 10;
     private ArrayList<ImageUtil> imageUtils;
-    private static boolean isList = false;
     private MediaImageAdapter imageAdapter;
+    private boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
-
-        progressBar = findViewById(R.id.media_progress_bar);
-        gridView = findViewById(R.id.media_grid_view);
-        listView = findViewById(R.id.media_list_view);
-
+        initialiseRecyclerView();
         startGallery();
-
-        gridView.setOnItemClickListener(onItemClickListener);
-        listView.setOnItemClickListener(onItemClickListener);
     }
-
-    private final AdapterView.OnItemClickListener onItemClickListener = (adapterView, view, i, l) -> {
-        Intent intent = new Intent(MediaImageActivity.this, ShowImageActivity.class);
-        ArrayList<String> imageUris = new ArrayList<>();
-        ArrayList<String> imageName = new ArrayList<>();
-        ArrayList<Integer> imageSize = new ArrayList<>();
-        ArrayList<Long> imageDate = new ArrayList<>();
-        ArrayList<String> imageLocation = new ArrayList<>();
-
-        for(ImageUtil util: imageUtils) {
-            imageUris.add(util.getUri());
-            imageName.add(util.getName());
-            imageSize.add(util.getSize());
-            imageDate.add(util.getDate());
-            imageLocation.add(util.getLocation());
-        }
-
-        long[] longList = new long[imageDate.size()];
-
-        for(int j = 0; j < imageDate.size(); j++) longList[j] = imageDate.get(j);
-
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList("image_uris", imageUris);
-        bundle.putStringArrayList("image_name", imageName);
-        bundle.putIntegerArrayList("image_size", imageSize);
-        bundle.putLongArray("image_date", longList);
-        bundle.putStringArrayList("image_location", imageLocation);
-
-        bundle.putInt("current_position", i);
-        intent.putExtra("bundle", bundle);
-
-        startActivity(intent);
-    };
 
     public void startGallery() {
         LoaderManager loaderManager = LoaderManager.getInstance(this);
@@ -95,29 +54,21 @@ public class MediaImageActivity extends AppCompatActivity
     @NotNull
     @Override
     public Loader<ArrayList<ImageUtil>> onCreateLoader(int id, @Nullable @org.jetbrains.annotations.Nullable Bundle args) {
-        gridView.setVisibility(View.GONE);
-        listView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         Log.e(LOG_TAG, "started onLoadFinished");
         return new MediaImageLoader(getApplicationContext());
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader, ArrayList<ImageUtil> data) {
 
-        imageAdapter = new MediaImageAdapter(getApplicationContext(), data, isList);
         Log.e(LOG_TAG, "Done onLoadFinished");
         progressBar.setVisibility(View.GONE);
-        imageUtils = data;
-
-        if(isList){
-            listView.setVisibility(View.VISIBLE);
-            listView.setAdapter(imageAdapter);
-        }else {
-            gridView.setVisibility(View.VISIBLE);
-            gridView.setAdapter(imageAdapter);
-        }
-
+        imageUtils.addAll(data);
+        recyclerView.setVisibility(View.VISIBLE);
+        imageAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -129,67 +80,73 @@ public class MediaImageActivity extends AppCompatActivity
         return true;
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.list_grid){
-            isList = !isList;
-            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
-            if(isList) {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
-                listView.setAdapter(imageAdapter);
-                listView.setVisibility(View.VISIBLE);
-                gridView.setVisibility(View.GONE);
-            } else {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
-                gridView.setAdapter(imageAdapter);
-                listView.setVisibility(View.GONE);
-                gridView.setVisibility(View.VISIBLE);
-            }
-            return true;
-        } else if (item.getItemId() == R.id.sort_date){
+        if(item.getItemId() == R.id.sort_date){
             ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
-            imageUtils.sort((imageUtil, t1) -> Long.compare(imageUtil.getDate(), t1.getDate()));
+            imageUtils.sort(Comparator.comparingLong(ImageUtil::getDate));
 
             if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
-
-            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
-
-            if(isList) listView.setAdapter(imageAdapter);
-            else gridView.setAdapter(imageAdapter);
+            imageAdapter.notifyDataSetChanged();
 
             return true;
-        } else if (item.getItemId() == R.id.sort_name){
+        }else if (item.getItemId() == R.id.sort_name){
             ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
-            imageUtils.sort((imageUtil, t1) -> imageUtil.getName().compareTo(t1.getName()));
+            imageUtils.sort(Comparator.comparing(ImageUtil::getName));
 
             if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
-
-            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
-
-            if(isList) listView.setAdapter(imageAdapter);
-            else gridView.setAdapter(imageAdapter);
+            imageAdapter.notifyDataSetChanged();
 
             return true;
-        } else if(item.getItemId() == R.id.sort_size){
+        }else if(item.getItemId() == R.id.sort_size){
             ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
+            imageUtils.sort(Comparator.comparingInt(ImageUtil::getSize));
 
-            imageUtils.sort((imageUtil, t1) -> imageUtil.getSize() - t1.getSize());
-
-            if(imageUtils.equals(temp)) {
-                Log.e(LOG_TAG, "this happen");
-                Collections.reverse(imageUtils);
-            }
-
-            imageAdapter = new MediaImageAdapter(getApplicationContext(), imageUtils, isList);
-
-            if(isList) listView.setAdapter(imageAdapter);
-            else gridView.setAdapter(imageAdapter);
+            if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
+            imageAdapter.notifyDataSetChanged();
 
             return true;
-        } else if(item.getItemId() == android.R.id.home){
+        } else if(item.getItemId() == android.R.id.home) {
             finish();
             return true;
-        } else return super.onOptionsItemSelected(item);
+        }else if(item.getItemId() == R.id.list_grid){
+            RecyclerView.LayoutManager layoutManager;
+
+            if(isList){
+                layoutManager = new GridLayoutManager(this, 2);
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+            }else{
+                layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+            }
+            recyclerView.setLayoutManager(layoutManager);
+            isList = !isList;
+            imageAdapter = new MediaImageAdapter(this, imageUtils, isList);
+            recyclerView.setAdapter(imageAdapter);
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
+    private void initialiseRecyclerView(){
+        progressBar = findViewById(R.id.media_progress_bar);
+        recyclerView = findViewById(R.id.media_recycler_view);
+        recyclerView.setVisibility(View.GONE);
+        imageUtils = new ArrayList<>();
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(false);
+        if(isList){
+            RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+            recyclerView.setLayoutManager(linearLayoutManager);
+            recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
+        }else{
+            RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+            recyclerView.setLayoutManager(gridLayoutManager);
+        }
+        imageAdapter = new MediaImageAdapter(this, imageUtils, isList);
+        recyclerView.setAdapter(imageAdapter);
+    }
+
 }

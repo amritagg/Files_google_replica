@@ -5,6 +5,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,10 +31,8 @@ public class MediaDownloadActivity extends AppCompatActivity
     private final String LOG_TAG = MediaDownloadActivity.class.getSimpleName();
 
     private ProgressBar progressBar;
-    private GridView gridView;
-    private ListView listView;
+    private RecyclerView recyclerView;
     private static final int LoaderManger_ID = 30;
-    private static boolean isList = false;
     private MediaDownloadAdapter downloadAdapter;
     private ArrayList<DownloadUtils> downloadUtils;
 
@@ -39,12 +41,8 @@ public class MediaDownloadActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        progressBar = findViewById(R.id.media_progress_bar);
-        gridView = findViewById(R.id.media_grid_view);
-        listView = findViewById(R.id.media_list_view);
-
+        initialiseRecyclerView();
         showDownloads();
-
     }
 
     private void showDownloads(){
@@ -56,34 +54,26 @@ public class MediaDownloadActivity extends AppCompatActivity
     @NotNull
     @Override
     public Loader<ArrayList<DownloadUtils>> onCreateLoader(int id, @Nullable @org.jetbrains.annotations.Nullable Bundle args) {
-        gridView.setVisibility(View.GONE);
-        listView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         Log.e(LOG_TAG, "started onLoadFinished");
         return new MediaDownloadLoader(getApplicationContext());
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<DownloadUtils>> loader, ArrayList<DownloadUtils> data) {
 
-        progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), data, isList);
-        downloadUtils = data;
+        progressBar.setVisibility(View.GONE);
+        downloadUtils.addAll(data);
+        recyclerView.setVisibility(View.VISIBLE);
+        downloadAdapter.notifyDataSetChanged();
 
-        if(isList){
-            listView.setVisibility(View.VISIBLE);
-            listView.setAdapter(downloadAdapter);
-        }else {
-            gridView.setVisibility(View.VISIBLE);
-            gridView.setAdapter(downloadAdapter);
-        }
     }
 
     @Override
-    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<DownloadUtils>> loader) {
-
-    }
+    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<DownloadUtils>> loader) { }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -93,24 +83,39 @@ public class MediaDownloadActivity extends AppCompatActivity
         return true;
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.list_grid){
-            isList = !isList;
-            downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), downloadUtils, isList);
-            if(isList) {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
-                listView.setAdapter(downloadAdapter);
-                listView.setVisibility(View.VISIBLE);
-                gridView.setVisibility(View.GONE);
-            } else {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
-                gridView.setAdapter(downloadAdapter);
-                listView.setVisibility(View.GONE);
-                gridView.setVisibility(View.VISIBLE);
-            }
-            return true;
-        }else return super.onOptionsItemSelected(item);
+//    @SuppressLint("UseCompatLoadingForDrawables")
+//    @Override
+//    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+//        if(item.getItemId() == R.id.list_grid){
+//            isList = !isList;
+//            downloadAdapter = new MediaDownloadAdapter(getApplicationContext(), downloadUtils, isList);
+//            if(isList) {
+//                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+//                listView.setAdapter(downloadAdapter);
+//                listView.setVisibility(View.VISIBLE);
+//                gridView.setVisibility(View.GONE);
+//            } else {
+//                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+//                gridView.setAdapter(downloadAdapter);
+//                listView.setVisibility(View.GONE);
+//                gridView.setVisibility(View.VISIBLE);
+//            }
+//            return true;
+//        }else return super.onOptionsItemSelected(item);
+//    }
+
+    private void initialiseRecyclerView(){
+        progressBar = findViewById(R.id.media_progress_bar);
+        recyclerView = findViewById(R.id.media_recycler_view);
+        recyclerView.setVisibility(View.GONE);
+        downloadUtils = new ArrayList<>();
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(false);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
+        downloadAdapter = new MediaDownloadAdapter(this, downloadUtils);
+        recyclerView.setAdapter(downloadAdapter);
     }
+
 }

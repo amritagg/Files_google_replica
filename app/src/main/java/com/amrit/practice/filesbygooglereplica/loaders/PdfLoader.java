@@ -17,17 +17,20 @@ public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
 
     private final String uri;
 
+    // constructor for pdfloader
     public PdfLoader(@NonNull @NotNull Context context, String uri) {
         super(context);
         this.uri = uri;
     }
 
+    // starting the background task
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
         forceLoad();
     }
 
+    // background process
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
@@ -35,6 +38,7 @@ public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
 
         ArrayList<Bitmap> arrayList = new ArrayList<>();
 
+        // getting file
         File file = new File(uri);
         ParcelFileDescriptor pdf;
         PdfRenderer pdfRenderer;
@@ -47,10 +51,10 @@ public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
                 PdfRenderer.Page page = pdfRenderer.openPage(i);
 
                 Bitmap mBitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
-                // say we render for showing on the screen
+                // we render for showing on the screen
                 page.render(mBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
 
-                // do stuff with the bitmap
+                // adding bitmap in arraylist
                 arrayList.add(mBitmap);
 
                 // close the page
@@ -62,6 +66,7 @@ public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
             arrayList = null;
         }
 
+        // return arraylist
         return arrayList;
     }
 }

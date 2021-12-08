@@ -2,12 +2,14 @@ package com.amrit.practice.filesbygooglereplica.utils;
 
 public class ImageUtil {
 
+    //  Required Params for the Image Files
     private String uri;
     private int size;
     private String name;
     private long date;
     private final String location;
 
+    // Constructor for the same
     public ImageUtil(String uri, int size, String name, long date, String location) {
         this.uri = uri;
         this.size = size;
@@ -16,7 +18,7 @@ public class ImageUtil {
         this.location = location;
     }
 
-
+    // Getters to get the values
     public String getUri() {
         return uri;
     }

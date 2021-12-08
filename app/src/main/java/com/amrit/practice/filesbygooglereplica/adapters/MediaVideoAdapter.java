@@ -9,89 +9,115 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.ShowVideoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MediaVideoAdapter extends BaseAdapter {
+public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.MediaVideoViewHolder>{
 
     private final ArrayList<VideoUtil> videoUtil;
     private final Context context;
     private Toast mToast;
     private final boolean isList;
 
-    public MediaVideoAdapter(ArrayList<VideoUtil> videoUtil, Context context, boolean isList) {
+    public MediaVideoAdapter(Context context, ArrayList<VideoUtil> videoUtil, boolean isList) {
         this.videoUtil = videoUtil;
         this.context = context;
         this.isList = isList;
     }
 
+    @NonNull
+    @SuppressLint("InflateParams")
     @Override
-    public int getCount() {
-        return videoUtil.size();
-    }
-
-    @Override
-    public Object getItem(int i) {
-        return getItemId(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @SuppressLint({"InflateParams", "UseCompatLoadingForDrawables"})
-    @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup) {
-        if(convertView == null){
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_view, null);
-        }
-
-        ImageView imageView;
-
-        if(isList) {
-            imageView = convertView.findViewById(R.id.list_image_view);
-            TextView name = convertView.findViewById(R.id.media_name_list);
-            name.setText(videoUtil.get(position).getName());
-            setupPopup(convertView, position);
+    public MediaVideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View layoutView;
+        if(isList){
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
         }else{
-            imageView = convertView.findViewById(R.id.grid_image_view);
-            TextView sizeText = convertView.findViewById(R.id.media_size);
-            sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
-            int sizeInt = videoUtil.get(position).getSize();
-            String sizeString = getSize(sizeInt);
-            sizeText.setText(sizeString);
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_media, null, false);
         }
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutView.setLayoutParams(lp);
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        return new MediaVideoViewHolder(layoutView, isList);
+    }
+
+    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
+    public void onBindViewHolder(@NonNull MediaVideoViewHolder holder, int position) {
+        holder.nameText.setText(videoUtil.get(position).getName());
+        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+
         Uri contentUris = Uri.parse(videoUtil.get(position).getUri());
         Glide.with(context)
                 .load(contentUris)
                 .placeholder(context.getDrawable(R.drawable.ic_baseline_videocam_24))
-                .into(imageView);
+                .into(holder.imageView);
 
-        return convertView;
+        if(isList){
+            holder.linearLayout.setOnClickListener(view -> startVideoActivity(position));
+            setupPopup(holder, position);
+        }else{
+            holder.relativeLayout.setOnClickListener(view -> startVideoActivity(position));
+            holder.sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
+            int sizeInt = videoUtil.get(position).getSize();
+            String sizeString = getSize(sizeInt);
+            holder.sizeText.setText(sizeString);
+        }
+
+    }
+
+    private void startVideoActivity(int position) {
+        Intent intent = new Intent(context, ShowVideoActivity.class);
+        ArrayList<String> videoUri = new ArrayList<>();
+        ArrayList<String> videoName = new ArrayList<>();
+        ArrayList<Integer> videoSize = new ArrayList<>();
+        ArrayList<String> videoLocation = new ArrayList<>();
+        ArrayList<Long> videoDate = new ArrayList<>();
+
+        for(VideoUtil util: videoUtil) {
+            videoUri.add(util.getUri());
+            videoName.add(util.getName());
+            videoSize.add(util.getSize());
+            videoDate.add(util.getDate());
+            videoLocation.add(util.getLocation());
+        }
+
+        long[] video_date = new long[videoDate.size()];
+
+        for(int j = 0; j < videoDate.size(); j++) video_date[j] = videoDate.get(j);
+
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("video_uris", videoUri);
+        bundle.putStringArrayList("video_name", videoName);
+        bundle.putIntegerArrayList("video_size", videoSize);
+        bundle.putStringArrayList("video_location", videoLocation);
+        bundle.putLongArray("video_date", video_date);
+
+        bundle.putInt("current_position", position);
+        intent.putExtra("INFO", bundle);
+        context.startActivity(intent);
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void setupPopup(View convertView, int position) {
-        ImageView imageMore = convertView.findViewById(R.id.list_more);
-        imageMore.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageMore);
+    private void setupPopup(MediaVideoViewHolder holder, int position) {
+        holder.list_more.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.list_more);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -122,8 +148,13 @@ public class MediaVideoAdapter extends BaseAdapter {
             });
             popupMenu.show();
         });
-
     }
+
+    @Override
+    public int getItemCount() {
+        return videoUtil.size();
+    }
+
     private void deleteToast(){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
@@ -137,6 +168,7 @@ public class MediaVideoAdapter extends BaseAdapter {
                 "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
         mToast.show();
     }
+
     private void deleteNoToast(String uri){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
@@ -206,6 +238,31 @@ public class MediaVideoAdapter extends BaseAdapter {
         sizeFloat = sizeFloat / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
         return sizeFloat + "MB";
+    }
+
+    public static class MediaVideoViewHolder extends RecyclerView.ViewHolder{
+
+        ImageView imageView;
+        ImageView list_more;
+        TextView nameText;
+        TextView sizeText;
+        LinearLayout linearLayout;
+        RelativeLayout relativeLayout;
+
+        public MediaVideoViewHolder(@NonNull View itemView, boolean isList) {
+            super(itemView);
+            if(isList){
+                imageView = itemView.findViewById(R.id.list_image_view);
+                nameText = itemView.findViewById(R.id.media_name_list);
+                linearLayout = itemView.findViewById(R.id.list_linearLayout);
+                list_more = itemView.findViewById(R.id.list_more);
+            }else {
+                imageView = itemView.findViewById(R.id.grid_image_view);
+                nameText = itemView.findViewById(R.id.media_name_grid);
+                relativeLayout = itemView.findViewById(R.id.grid_layout);
+                sizeText = itemView.findViewById(R.id.media_size);
+            }
+        }
     }
 
 }

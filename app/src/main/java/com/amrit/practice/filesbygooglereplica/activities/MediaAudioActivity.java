@@ -5,16 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
@@ -23,6 +23,7 @@ import com.amrit.practice.filesbygooglereplica.R;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 
 public class MediaAudioActivity extends AppCompatActivity
         implements LoaderManager.LoaderCallbacks<ArrayList<AudioUtil>> {
@@ -30,60 +31,20 @@ public class MediaAudioActivity extends AppCompatActivity
     private final String LOG_TAG = MediaAudioActivity.class.getSimpleName();
 
     private ProgressBar progressBar;
-    private GridView gridView;
-    private ListView listView;
+    private RecyclerView recyclerView;
     private static final int LoaderManger_ID = 15;
     private ArrayList<AudioUtil> audioUtil;
-    private static boolean isList = false;
     private MediaAudioAdapter audioAdapter;
+    private boolean isList = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_media);
 
-        progressBar = findViewById(R.id.media_progress_bar);
-        gridView = findViewById(R.id.media_grid_view);
-        listView = findViewById(R.id.media_list_view);
-
+        initialiseRecyclerView();
         showAudio();
-
-        gridView.setOnItemClickListener(onItemClickListener);
-        listView.setOnItemClickListener(onItemClickListener);
     }
-
-    private final AdapterView.OnItemClickListener onItemClickListener = (adapterView, view, i, l) -> {
-        Intent intent = new Intent(MediaAudioActivity.this, ShowAudioActivity.class);
-        ArrayList<String> audioUris = new ArrayList<>();
-        ArrayList<String> audioNames = new ArrayList<>();
-        ArrayList<Integer> audioSize = new ArrayList<>();
-        ArrayList<String> audioLocation = new ArrayList<>();
-        ArrayList<Long> audioDate = new ArrayList<>();
-
-        for(AudioUtil util: audioUtil) {
-            audioUris.add(util.getUri());
-            audioNames.add(util.getName());
-            audioSize.add(util.getSize());
-            audioLocation.add(util.getLocation());
-            audioDate.add(util.getDate());
-        }
-
-        long[] audio_date = new long[audioDate.size()];
-
-        for(int j = 0; j < audioDate.size(); j++) audio_date[j] = audioDate.get(j);
-
-        Bundle bundle = new Bundle();
-        bundle.putStringArrayList("uris", audioUris);
-        bundle.putStringArrayList("location", audioLocation);
-        bundle.putStringArrayList("names", audioNames);
-        bundle.putIntegerArrayList("size", audioSize);
-        bundle.putLongArray("dates", audio_date);
-
-        bundle.putInt("position", i);
-        intent.putExtra("INFO", bundle);
-
-        startActivity(intent);
-    };
 
     private void showAudio() {
         LoaderManager loaderManager = LoaderManager.getInstance(this);
@@ -94,35 +55,25 @@ public class MediaAudioActivity extends AppCompatActivity
     @NotNull
     @Override
     public Loader<ArrayList<AudioUtil>> onCreateLoader(int id, @Nullable @org.jetbrains.annotations.Nullable Bundle args) {
-        gridView.setVisibility(View.GONE);
-        listView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         Log.e(LOG_TAG, "started onLoadFinished");
         return new MediaAudioLoader(getApplicationContext());
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<AudioUtil>> loader, ArrayList<AudioUtil> data) {
 
-        progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        audioAdapter = new MediaAudioAdapter(getApplicationContext(), data, isList);
-        audioUtil = data;
-
-        if(isList){
-            listView.setVisibility(View.VISIBLE);
-            listView.setAdapter(audioAdapter);
-        }else {
-            gridView.setVisibility(View.VISIBLE);
-            gridView.setAdapter(audioAdapter);
-        }
-
+        progressBar.setVisibility(View.GONE);
+        audioUtil.addAll(data);
+        recyclerView.setVisibility(View.VISIBLE);
+        audioAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<AudioUtil>> loader) {
-
-    }
+    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<AudioUtil>> loader) { }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -130,62 +81,72 @@ public class MediaAudioActivity extends AppCompatActivity
         return true;
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.list_grid){
-            isList = !isList;
-            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
-            if(isList) {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
-                listView.setAdapter(audioAdapter);
-                listView.setVisibility(View.VISIBLE);
-                gridView.setVisibility(View.GONE);
-            } else {
-                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
-                gridView.setAdapter(audioAdapter);
-                listView.setVisibility(View.GONE);
-                gridView.setVisibility(View.VISIBLE);
-            }
-            return true;
-        } else if (item.getItemId() == R.id.sort_date) {
+        if (item.getItemId() == R.id.sort_date) {
             ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
+            audioUtil.sort(Comparator.comparingLong(AudioUtil::getDate));
 
-            audioUtil.sort((audioUtil, t1) -> Long.compare(audioUtil.getDate(), t1.getDate()));
-            if(audioUtil.equals(temp)) Collections.reverse(audioUtil);
-
-            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
-
-            if(isList) listView.setAdapter(audioAdapter);
-            else gridView.setAdapter(audioAdapter);
+            if (audioUtil.equals(temp)) Collections.reverse(audioUtil);
+            audioAdapter.notifyDataSetChanged();
 
             return true;
-        } else if (item.getItemId() == R.id.sort_name){
+        } else if (item.getItemId() == R.id.sort_name) {
             ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
-            audioUtil.sort((audioUtil, t1) -> audioUtil.getName().compareTo(t1.getName()));
-            if(audioUtil.equals(temp)) Collections.reverse(audioUtil);
+            audioUtil.sort(Comparator.comparing(AudioUtil::getName));
 
-            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
-
-            if(isList) listView.setAdapter(audioAdapter);
-            else gridView.setAdapter(audioAdapter);
+            if (audioUtil.equals(temp)) Collections.reverse(audioUtil);
+            audioAdapter.notifyDataSetChanged();
 
             return true;
-        } else if(item.getItemId() == R.id.sort_size){
+        } else if (item.getItemId() == R.id.sort_size) {
             ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
-            audioUtil.sort((audioUtil, t1) -> audioUtil.getSize() - t1.getSize());
+            audioUtil.sort(Comparator.comparingInt(AudioUtil::getSize));
 
-            if(audioUtil.equals(temp)) Collections.reverse(audioUtil);
-
-            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
-
-            if(isList) listView.setAdapter(audioAdapter);
-            else gridView.setAdapter(audioAdapter);
+            if (audioUtil.equals(temp)) Collections.reverse(audioUtil);
+            audioAdapter.notifyDataSetChanged();
 
             return true;
-        } else if(item.getItemId() == android.R.id.home){
+        } else if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
-        } else return super.onOptionsItemSelected(item);
+        } else if(item.getItemId() == R.id.list_grid){
+            RecyclerView.LayoutManager layoutManager;
+
+            if(isList){
+                layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
+            }else{
+                layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+                item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
+            }
+            recyclerView.setLayoutManager(layoutManager);
+            isList = !isList;
+            audioAdapter = new MediaAudioAdapter(this, audioUtil, isList);
+            recyclerView.setAdapter(audioAdapter);
+
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
+    private void initialiseRecyclerView(){
+        progressBar = findViewById(R.id.media_progress_bar);
+        recyclerView = findViewById(R.id.media_recycler_view);
+        recyclerView.setVisibility(View.GONE);
+        audioUtil = new ArrayList<>();
+        recyclerView.setNestedScrollingEnabled(false);
+        recyclerView.setHasFixedSize(false);
+        RecyclerView.LayoutManager layoutManager;
+
+        if (isList) layoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
+        else layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
+        audioAdapter = new MediaAudioAdapter(this, audioUtil, isList);
+        recyclerView.setAdapter(audioAdapter);
+    }
+
 }

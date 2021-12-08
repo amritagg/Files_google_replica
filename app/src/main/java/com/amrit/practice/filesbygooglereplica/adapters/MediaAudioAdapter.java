@@ -10,26 +10,29 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
+import com.amrit.practice.filesbygooglereplica.activities.ShowAudioActivity;
 import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MediaAudioAdapter extends BaseAdapter {
+public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.MediaAudioViewHolder>{
 
     public final String LOG_TAG = MediaAudioAdapter.class.getSimpleName();
-
-    private final boolean isList;
     private final ArrayList<AudioUtil> audioUtils;
     private final Context context;
     private Toast mToast;
+    private final boolean isList;
 
     public MediaAudioAdapter(Context context, ArrayList<AudioUtil> audioUtils, boolean isList) {
         this.context = context;
@@ -37,82 +40,87 @@ public class MediaAudioAdapter extends BaseAdapter {
         this.isList = isList;
     }
 
+    @NonNull
     @Override
-    public int getCount() {
+    @SuppressLint("InflateParams")
+    public MediaAudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View layoutView;
+        if(isList) layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
+        else layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_media, null, false);
+
+        RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutView.setLayoutParams(lp);
+
+        return new MediaAudioViewHolder(layoutView, isList);
+    }
+
+    @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
+    @Override
+    public void onBindViewHolder(@NonNull MediaAudioViewHolder holder, int position) {
+        if(isList){
+            setUpPop(holder, position);
+            holder.linearLayout.setOnClickListener(view -> startAudioActivity(position));
+        }else{
+            holder.relativeLayout.setOnClickListener(view -> startAudioActivity(position));
+            String size_string = getSize(audioUtils.get(position).getSize());
+            holder.sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
+            holder.sizeText.setText(size_string);
+        }
+        String name = audioUtils.get(position).getName();
+        if(name.length() > 0) holder.nameText.setText(name);
+        else holder.nameText.setText("Residue file you must delete it");
+        holder.nameText.setShadowLayer(2, 1, 1, Color.BLACK);
+
+        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        Bitmap bitmap = audioUtils.get(position).getBitmap();
+
+        if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
+        else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_audiotrack_24));
+
+    }
+
+    @Override
+    public int getItemCount() {
         return audioUtils.size();
     }
 
-    @Override
-    public Object getItem(int i) {
-        return getItemId(i);
-    }
+    private void startAudioActivity(int position){
+        Intent intent = new Intent(context, ShowAudioActivity.class);
+        ArrayList<String> audioUris = new ArrayList<>();
+        ArrayList<String> audioNames = new ArrayList<>();
+        ArrayList<Integer> audioSize = new ArrayList<>();
+        ArrayList<String> audioLocation = new ArrayList<>();
+        ArrayList<Long> audioDate = new ArrayList<>();
 
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @SuppressLint({"InflateParams", "SetTextI18n", "UseCompatLoadingForDrawables"})
-    @Override
-    public View getView(int position, View convertView, ViewGroup viewGroup) {
-        if(convertView == null){
-            LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            assert layoutInflater != null;
-            if(!isList) convertView = layoutInflater.inflate(R.layout.grid_media, null);
-            else convertView = layoutInflater.inflate(R.layout.list_view, null);
+        for(AudioUtil util: audioUtils) {
+            audioUris.add(util.getUri());
+            audioNames.add(util.getName());
+            audioSize.add(util.getSize());
+            audioLocation.add(util.getLocation());
+            audioDate.add(util.getDate());
         }
 
-        ImageView imageView;
-        TextView fileName;
+        long[] audio_date = new long[audioDate.size()];
 
-        if(isList){
-            imageView = convertView.findViewById(R.id.list_image_view);
-            fileName = convertView.findViewById(R.id.media_name_list);
-            setupPopUp(convertView, position);
-        }else {
-            imageView = convertView.findViewById(R.id.grid_image_view);
-            fileName = convertView.findViewById(R.id.media_name_grid);
-            TextView size = convertView.findViewById(R.id.media_size);
+        for(int j = 0; j < audioDate.size(); j++) audio_date[j] = audioDate.get(j);
 
-            String size_string = getSize(audioUtils.get(position).getSize());
-            size.setShadowLayer(2, 1, 1, Color.BLACK);
-            size.setText(size_string);
-        }
+        Bundle bundle = new Bundle();
+        bundle.putStringArrayList("uris", audioUris);
+        bundle.putStringArrayList("location", audioLocation);
+        bundle.putStringArrayList("names", audioNames);
+        bundle.putIntegerArrayList("size", audioSize);
+        bundle.putLongArray("dates", audio_date);
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Bitmap bitmap = audioUtils.get(position).getBitmap();
+        bundle.putInt("position", position);
+        intent.putExtra("INFO", bundle);
 
-        if(bitmap != null) imageView.setImageBitmap(bitmap);
-        else imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_audiotrack_24));
-
-        String name = audioUtils.get(position).getName();
-
-        if(name.length() > 0) fileName.setText(name);
-        else fileName.setText("Residue file you must delete it");
-
-        fileName.setShadowLayer(2, 1, 1, Color.BLACK);
-
-        return convertView;
-    }
-
-    @NotNull
-    private String getSize(int size){
-        float sizeFloat = (float) size / 1024;
-        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
-
-        if(sizeFloat < 1024) return sizeFloat + "KB";
-
-        sizeFloat = sizeFloat / 1024;
-        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
-        return sizeFloat + "MB";
+        context.startActivity(intent);
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void setupPopUp(View convertView, int position) {
-
-        ImageView imageView = convertView.findViewById(R.id.list_more);
-        imageView.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), imageView);
+    private void setUpPop(MediaAudioViewHolder holder, int position){
+        holder.list_more.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.list_more);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -142,7 +150,18 @@ public class MediaAudioAdapter extends BaseAdapter {
             });
             popupMenu.show();
         });
+    }
 
+    @NotNull
+    private String getSize(int size){
+        float sizeFloat = (float) size / 1024;
+        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
+
+        if(sizeFloat < 1024) return sizeFloat + "KB";
+
+        sizeFloat = sizeFloat / 1024;
+        sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
+        return sizeFloat + "MB";
     }
 
     private void deleteToast(){
@@ -204,6 +223,31 @@ public class MediaAudioAdapter extends BaseAdapter {
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
 
+    }
+
+    public static class MediaAudioViewHolder extends RecyclerView.ViewHolder{
+
+        ImageView imageView;
+        ImageView list_more;
+        TextView nameText;
+        TextView sizeText;
+        LinearLayout linearLayout;
+        RelativeLayout relativeLayout;
+
+        public MediaAudioViewHolder(@NonNull View itemView, boolean isList) {
+            super(itemView);
+            if(isList){
+                imageView = itemView.findViewById(R.id.list_image_view);
+                nameText = itemView.findViewById(R.id.media_name_list);
+                list_more = itemView.findViewById(R.id.list_more);
+                linearLayout = itemView.findViewById(R.id.list_linearLayout);
+            }else{
+                imageView = itemView.findViewById(R.id.grid_image_view);
+                nameText = itemView.findViewById(R.id.media_name_grid);
+                sizeText = itemView.findViewById(R.id.media_size);
+                relativeLayout = itemView.findViewById(R.id.grid_layout);
+            }
+        }
     }
 
 }

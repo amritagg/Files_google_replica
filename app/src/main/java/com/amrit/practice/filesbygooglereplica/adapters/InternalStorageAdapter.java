@@ -50,7 +50,7 @@ public class InternalStorageAdapter extends BaseAdapter {
             LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             assert layoutInflater != null;
             if (!isList) convertView = layoutInflater.inflate(R.layout.grid_internal, null);
-            else convertView = layoutInflater.inflate(R.layout.list_view, null);
+            else convertView = layoutInflater.inflate(R.layout.list_media, null);
         }
 
         ImageView imageView;

@@ -25,23 +25,27 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
     private final Context context;
     private final String LOG_TAG = MediaAudioLoader.class.getSimpleName();
 
+    // constructor for audio loader
     public MediaAudioLoader(@NonNull @NotNull Context context) {
         super(context);
         this.context = context;
     }
 
+    // starting the background task
     @Override
     protected void onStartLoading() {
         super.onStartLoading();
         forceLoad();
     }
 
+    // during background task
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
     public ArrayList<AudioUtil> loadInBackground() {
         ArrayList<AudioUtil> list = new ArrayList<>();
 
+        // details required for audio files
         String[] projection = new String[]{
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.TITLE,
@@ -50,6 +54,7 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
                 MediaStore.Audio.Media.RELATIVE_PATH
         };
 
+        // starting the cursor
         try (Cursor cursor = context.getContentResolver().query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 projection,
@@ -74,6 +79,7 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
 
                 AudioUtil audioUtil;
 
+                // loading bitmap
                 Bitmap bitmap = null;
                 try {
                     bitmap = context.getContentResolver().loadThumbnail(
@@ -85,6 +91,7 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
                     Log.e(LOG_TAG, "Bitmap not available");
                 }
 
+                // adding details in list
                 audioUtil = new AudioUtil(contentUri.toString(), size, title, bitmap, location, date);
                 list.add(audioUtil);
             }

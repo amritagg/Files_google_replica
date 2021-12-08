@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 
 public class AudioUtil {
 
+    //  Required Params for the Audio Files
     private final String uri;
     private final int size;
     private final String name;
@@ -11,6 +12,7 @@ public class AudioUtil {
     private final long date;
     private final String location;
 
+    // Constructor for the same
     public AudioUtil(String uri, int size, String name, Bitmap bitmap, String location, long date) {
         this.uri = uri;
         this.size = size;
@@ -20,6 +22,7 @@ public class AudioUtil {
         this.date = date;
     }
 
+    // Getters to get the values
     public long getDate() {
         return date;
     }
