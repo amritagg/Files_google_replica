@@ -118,6 +118,7 @@ public class MediaImageActivity extends AppCompatActivity
                 item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
             }else{
                 layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+                recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
                 item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
             }
             recyclerView.setLayoutManager(layoutManager);

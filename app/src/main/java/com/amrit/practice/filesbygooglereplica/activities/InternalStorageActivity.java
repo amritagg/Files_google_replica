@@ -127,9 +127,9 @@ public class InternalStorageActivity extends AppCompatActivity
         bundle.putStringArrayList("uris", list);
         bundle.putInt("current_position", current);
 
-        Intent intent = new Intent(InternalStorageActivity.this, ShowImageActivity.class);
-        intent.putExtra("from_internal", bundle);
-        startActivity(intent);
+//        Intent intent = new Intent(InternalStorageActivity.this, ShowImageActivity.class);
+//        intent.putExtra("from_internal", bundle);
+//        startActivity(intent);
     }
 
     private void startAudioPlayer(int pos){

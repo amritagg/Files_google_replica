@@ -17,6 +17,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
@@ -26,6 +29,7 @@ import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -58,12 +62,18 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
         return new MediaImageViewHolder(layoutView, isList);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull MediaImageViewHolder holder, int position) {
         if(isList){
+            Date date = new Date(imageUtil.get(position).getDate());
+            @SuppressLint("SimpleDateFormat")
+            SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy");
+            String dateText = df2.format(date);
+            String size = getSize(imageUtil.get(position).getSize());
             setUpPopUp(holder, position);
             holder.linear.setOnClickListener(view -> startImageActivity(position));
+            holder.mediaDate.setText(dateText + ", " + size);
         }else{
             holder.mediaName.setShadowLayer(2, 1, 1, Color.BLACK);
             holder.mediaSize.setShadowLayer(2, 1, 1, Color.BLACK);
@@ -89,7 +99,9 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
     }
 
     private void startImageActivity(int position){
+
         Intent intent = new Intent(context, ShowImageActivity.class);
+
         ArrayList<String> imageUris = new ArrayList<>();
         ArrayList<String> imageName = new ArrayList<>();
         ArrayList<Integer> imageSize = new ArrayList<>();
@@ -141,13 +153,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
                         infoImage(position);
                         break;
                     case R.id.delete_permanent:
-                        deleteToast();
-                        break;
-                    case R.id.yes:
-                        deleteYesToast(imageUtil.get(position).getUri());
-                        break;
-                    case R.id.no:
-                        deleteNoToast(imageUtil.get(position).getUri());
+                        deleteToast(imageUtil.get(position).getUri());
                         break;
                     default:
                         return false;
@@ -159,25 +165,16 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
 
     }
 
-    private void deleteToast(){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "Do you really want to delete image", Toast.LENGTH_LONG);
-        mToast.show();
-    }
-
-    private void deleteYesToast(String uri){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
-        mToast.show();
-    }
-
-    private void deleteNoToast(String uri){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "The file " + uri + " will not be deleted", Toast.LENGTH_SHORT);
-        mToast.show();
+    private void deleteToast(String uri){
+        new AlertDialog.Builder(context)
+                .setTitle("Delete Image")
+                .setMessage("Do You really want to delete the image")
+                .setPositiveButton("YES!!",
+                        (dialog, which) -> Toast.makeText(context, "The file " + uri + " is deleted", Toast.LENGTH_SHORT).show())
+                .setNegativeButton("NO!",
+                        (dialog, which) -> Toast.makeText(context, "The file " + uri + " will not be deleted", Toast.LENGTH_SHORT).show())
+                .create()
+                .show();
     }
 
     private void imageOpenWith(int position) {
@@ -236,6 +233,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
         ImageView listMore;
         TextView mediaName;
         TextView mediaSize;
+        TextView mediaDate;
         LinearLayout linear;
         RelativeLayout relative;
 
@@ -246,6 +244,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
                 mediaName = itemView.findViewById(R.id.media_name_list);
                 linear = itemView.findViewById(R.id.list_linearLayout);
                 listMore = itemView.findViewById(R.id.list_more);
+                mediaDate = itemView.findViewById(R.id.media_size_date_list);
             }else{
                 imageView = itemView.findViewById(R.id.grid_image_view);
                 mediaName = itemView.findViewById(R.id.media_name_grid);

@@ -1,23 +1,22 @@
 package com.amrit.practice.filesbygooglereplica.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import androidx.annotation.NonNull;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.ShowImageActivity;
 import com.bumptech.glide.Glide;
+import com.github.chrisbanes.photoview.PhotoView;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageViewPagerAdapter.ViewHolder> {
 
-    private final String LOG_TAG = ShowImageViewPagerAdapter.class.getSimpleName();
     private final Context mContext;
     private final ArrayList<String> imageUris;
     private final boolean isMedia;
@@ -39,7 +38,10 @@ public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageVie
     @Override
     public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
 
-        Log.e(LOG_TAG, imageUris.get(position));
+        holder.imageView.setOnClickListener(view -> {
+            Intent intent = new Intent("show_hide");
+            LocalBroadcastManager.getInstance(mContext).sendBroadcast(intent);
+        });
 
         if(isMedia){
             Uri uri = Uri.parse(imageUris.get(position));
@@ -60,7 +62,7 @@ public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageVie
 
     static class ViewHolder extends RecyclerView.ViewHolder {
 
-        ImageView imageView;
+        PhotoView imageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

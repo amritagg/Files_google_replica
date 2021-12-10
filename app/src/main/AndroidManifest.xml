@@ -19,6 +19,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity
+            android:name=".activities.ShowImageActivity"
+            android:exported="false" />
         <activity android:name=".activities.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -31,11 +34,6 @@
             android:label="Images"
             android:launchMode="singleTop"
             android:parentActivityName=".activities.HomeActivity" />
-        <activity
-            android:name=".activities.ShowImageActivity"
-            android:label="Show Images"
-            android:launchMode="singleTop"
-            android:parentActivityName=".activities.MediaImageActivity" />
         <activity
             android:name=".activities.InfoActivity"
             android:label="File Info"
