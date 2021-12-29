@@ -3,6 +3,16 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_player_control_view.xml" value="0.1" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_player_view.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_player_control_ffwd_button.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_player_control_rewind_button.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_player_control_view.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_player_view.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_settings_list.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_settings_list_item.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_styled_sub_settings_list_item.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/.gradle/caches/transforms-2/files-2.1/8b078e3d8032126b6886e27b74fe4c66/exoplayer-ui-2.14.1/res/layout/exo_track_selection_dialog.xml" value="0.25" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/drawable/ic_baseline_delete_forever_24.xml" value="0.2169230769230769" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/drawable/ic_baseline_info_24.xml" value="0.2169230769230769" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/drawable/ic_baseline_share_24.xml" value="0.2169230769230769" />
@@ -10,7 +20,10 @@
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/drawable/show_image_top.xml" value="0.2169230769230769" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_main.xml" value="0.1" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_media.xml" value="0.22" />
+        <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_show_audio.xml" value="0.10643115942028986" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_show_image.xml" value="0.19157608695652173" />
+        <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/custom_audio_player.xml" value="0.18" />
+        <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/custom_audio_player_view.xml" value="0.1" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/fragment_show_image.xml" value="0.16530797101449277" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/grid_media.xml" value="0.67" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/list_media.xml" value="0.5" />

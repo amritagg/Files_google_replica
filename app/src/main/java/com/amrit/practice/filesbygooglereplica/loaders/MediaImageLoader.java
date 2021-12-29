@@ -49,7 +49,7 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
                 MediaStore.Images.Media._ID,
                 MediaStore.Images.Media.DISPLAY_NAME,
                 MediaStore.Images.Media.SIZE,
-                MediaStore.Images.Media.DATE_TAKEN,
+                MediaStore.Images.Media.DATE_MODIFIED,
                 MediaStore.Images.Media.RELATIVE_PATH
         };
 
@@ -59,13 +59,13 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
                 projection,
                 null,
                 null,
-                MediaStore.Images.Media.DATE_TAKEN + " DESC"
+                MediaStore.Images.Media.DATE_MODIFIED + " DESC"
         )) {
             assert cursor != null;
             int idColumn = cursor.getColumnIndex(MediaStore.Images.Media._ID);
             int sizeColumn = cursor.getColumnIndex(MediaStore.Images.Media.SIZE);
             int nameColumn = cursor.getColumnIndex(MediaStore.Images.Media.DISPLAY_NAME);
-            int dateColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATE_TAKEN);
+            int dateColumn = cursor.getColumnIndex(MediaStore.Images.Media.DATE_MODIFIED);
             int locationColumn = cursor.getColumnIndex(MediaStore.Images.Media.RELATIVE_PATH);
 
             while (cursor.moveToNext()) {
@@ -89,4 +89,5 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
 
         return list;
     }
+
 }

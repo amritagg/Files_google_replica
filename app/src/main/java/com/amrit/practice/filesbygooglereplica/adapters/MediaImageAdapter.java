@@ -18,8 +18,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
@@ -37,7 +35,6 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
 
     private final ArrayList<ImageUtil> imageUtil;
     private final Context context;
-    private Toast mToast;
     private final boolean isList;
 
     public MediaImageAdapter(Context context, ArrayList<ImageUtil> imageUtil, boolean isList) {
@@ -66,7 +63,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
     @Override
     public void onBindViewHolder(@NonNull MediaImageViewHolder holder, int position) {
         if(isList){
-            Date date = new Date(imageUtil.get(position).getDate());
+            Date date = new Date(imageUtil.get(position).getDate()*1000);
             @SuppressLint("SimpleDateFormat")
             SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy");
             String dateText = df2.format(date);
@@ -113,7 +110,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
             imageName.add(util.getName());
             imageSize.add(util.getSize());
             imageDate.add(util.getDate());
-            imageLocation.add(util.getLocation());
+            imageLocation.add(util.getPath());
         }
 
         long[] longList = new long[imageDate.size()];
@@ -207,7 +204,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
         Date date = new Date(imageUtil.get(position).getDate() * 1000);
         bundle.putString("uri", imageUtil.get(position).getUri());
         bundle.putString("name", imageUtil.get(position).getName());
-        bundle.putString("location", imageUtil.get(position).getLocation());
+        bundle.putString("location", imageUtil.get(position).getPath());
         bundle.putString("time", date.toString());
         bundle.putString("size", size_string);
         intent.putExtra("INFO", bundle);

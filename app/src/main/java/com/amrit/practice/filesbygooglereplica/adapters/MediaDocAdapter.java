@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,43 +25,71 @@ import com.amrit.practice.filesbygooglereplica.activities.MediaDocumentsActivity
 import com.amrit.practice.filesbygooglereplica.activities.ShowPdfActivity;
 import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
 import org.jetbrains.annotations.NotNull;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaDocViewHolder> {
 
     private final Context context;
     private final ArrayList<DocumentsUtil> data;
-    private Toast mToast;
     private static final String LOG_TAG = MediaDocAdapter.class.getSimpleName();
+    private final boolean isList;
+    private Toast mToast;
 
-    public MediaDocAdapter(Context context, ArrayList<DocumentsUtil> data) {
+    public MediaDocAdapter(Context context, ArrayList<DocumentsUtil> data, boolean isList) {
         this.context = context;
         this.data = data;
+        this.isList = isList;
     }
 
+    @SuppressLint("InflateParams")
     @NonNull
     @Override
     public MediaDocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
+        View layoutView;
+        if(isList){
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
+        }else{
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_media, null, false);
+        }
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
 
-        return new MediaDocViewHolder(layoutView);
+        return new MediaDocViewHolder(layoutView, isList);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull MediaDocViewHolder holder, int position) {
-        holder.layout.setOnClickListener(view -> startImageActivity(position));
-        setupPopUp(holder, position);
-        holder.textName.setText(data.get(position).getName());
-        setupPopUp(holder, position);
+        if(isList){
+            Date date = new Date(data.get(position).getDate()*1000);
+            @SuppressLint("SimpleDateFormat")
+            SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy");
+            String dateText = df2.format(date);
+            String size = getSize(data.get(position).getSize());
+//            setUpPop(holder, position);
+            holder.linear.setOnClickListener(view -> startImageActivity(position));
+            holder.mediaDate.setText(dateText + ", " + size);
+        }else{
+            holder.mediaName.setShadowLayer(2, 1, 1, Color.BLACK);
+            holder.mediaSize.setShadowLayer(2, 1, 1, Color.BLACK);
+            String sizeString = getSize(data.get(position).getSize());
+            holder.mediaSize.setText(sizeString);
+            holder.relative.setOnClickListener(view -> startImageActivity(position));
+        }
 
         holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Bitmap bitmap = data.get(position).getBitmap();
+
         if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
         else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
 
+        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        String name = data.get(position).getName();
+        holder.mediaName.setText(name);
+        
     }
 
     private void startImageActivity(int position) {
@@ -86,61 +115,47 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaD
         return sizeFloat + "MB";
     }
 
-    @SuppressLint("NonConstantResourceId")
-    private void setupPopUp(MediaDocViewHolder convertView, int position) {
-
-        convertView.list_more.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), convertView.list_more);
-            popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
-
-            popupMenu.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()){
-                    case R.id.share:
-                        shareDocument(data.get(position).getUri());
-                        break;
-                    case R.id.open_with:
-                        docOpenWith(position);
-                        break;
-                    case R.id.file_info:
-                        infoDocument(position);
-                        break;
-                    case R.id.delete_permanent:
-                        deleteToast();
-                        break;
-                    case R.id.yes:
-                        deleteYesToast(data.get(position).getUri());
-                        break;
-                    case R.id.no:
-                        deleteNoToast(data.get(position).getUri());
-                        break;
-                    default:
-                        return false;
-                }
-                return true;
-            });
-            popupMenu.show();
-        });
-
-    }
+//    @SuppressLint("NonConstantResourceId")
+//    private void setupPopUp(MediaDocViewHolder convertView, int position) {
+//
+//        convertView.list_more.setOnClickListener(view -> {
+//            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), convertView.list_more);
+//            popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
+//
+//            popupMenu.setOnMenuItemClickListener(menuItem -> {
+//                switch (menuItem.getItemId()){
+//                    case R.id.share:
+//                        shareDocument(data.get(position).getUri());
+//                        break;
+//                    case R.id.open_with:
+//                        docOpenWith(position);
+//                        break;
+//                    case R.id.file_info:
+//                        infoDocument(position);
+//                        break;
+//                    case R.id.delete_permanent:
+//                        deleteToast();
+//                        break;
+//                    case R.id.yes:
+//                        deleteYesToast(data.get(position).getUri());
+//                        break;
+//                    case R.id.no:
+//                        deleteNoToast(data.get(position).getUri());
+//                        break;
+//                    default:
+//                        return false;
+//                }
+//                return true;
+//            });
+//            popupMenu.show();
+//        });
+//
+//    }
 
     private void deleteToast(){
         if(mToast != null) mToast.cancel();
         mToast = Toast.makeText(context,
                 "Do you really want to delete doc", Toast.LENGTH_LONG);
-        mToast.show();
-    }
-
-    private void deleteYesToast(String uri){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
-        mToast.show();
-    }
-
-    private void deleteNoToast(String uri){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "The file " + uri + " will not be deleted", Toast.LENGTH_SHORT);
         mToast.show();
     }
 
@@ -180,16 +195,31 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaD
     public static class MediaDocViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
-        TextView textName;
-        ImageView list_more;
-        LinearLayout layout;
+//        TextView textName;
+//        ImageView list_more;
+//        LinearLayout layout;
 
-        public MediaDocViewHolder(@NonNull View itemView) {
+        ImageView listMore;
+        TextView mediaName;
+        TextView mediaSize;
+        TextView mediaDate;
+        LinearLayout linear;
+        RelativeLayout relative;
+
+        public MediaDocViewHolder(@NonNull View itemView, boolean isList) {
             super(itemView);
-            imageView = itemView.findViewById(R.id.list_image_view);
-            textName = itemView.findViewById(R.id.media_name_list);
-            list_more = itemView.findViewById(R.id.list_more);
-            layout = itemView.findViewById(R.id.list_linearLayout);
+            if(isList){
+                imageView = itemView.findViewById(R.id.list_image_view);
+                mediaName = itemView.findViewById(R.id.media_name_list);
+                linear = itemView.findViewById(R.id.list_linearLayout);
+                listMore = itemView.findViewById(R.id.list_more);
+                mediaDate = itemView.findViewById(R.id.media_size_date_list);
+            }else{
+                imageView = itemView.findViewById(R.id.grid_image_view);
+                mediaName = itemView.findViewById(R.id.media_name_grid);
+                mediaSize = itemView.findViewById(R.id.media_size);
+                relative = itemView.findViewById(R.id.grid_layout);
+            }
         }
     }
 

@@ -1,30 +1,45 @@
 package com.amrit.practice.filesbygooglereplica.loaders;
 
+import android.content.ContentUris;
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
 import android.os.ParcelFileDescriptor;
+import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Size;
+import android.webkit.MimeTypeMap;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
 import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
+import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Queue;
 
 public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
 
     private final String LOG_TAG = MediaDocLoader.class.getSimpleName();
     private final Context context;
 
-    // constructor for docloader
+    // constructor for docLoader
     public MediaDocLoader(@NonNull @NotNull Context context) {
         super(context);
         this.context = context;
@@ -43,55 +58,110 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
     @Override
     public ArrayList<DocumentsUtil> loadInBackground() {
 
+//        ArrayList<DocumentsUtil> list = new ArrayList<>();
+//
+//        // getting home file from current file
+//        File file = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
+//                context.getExternalFilesDir(null) // /storage/emulated/0/Android/data/com.amrit.practice.filesByGoogleReplica/files
+//                .getParentFile()) // /storage/emulated/0/Android/data/com.amrit.practice.filesByGoogleReplica
+//                .getParentFile()) // /storage/emulated/0/Android/data
+//                .getParentFile()) // /storage/emulated/0/Android
+//                .getParentFile(); // /storage/emulated/0
+//
+//        Log.e(LOG_TAG, "Process started");
+//
+//        Queue<File> q = new LinkedList<>();
+//        q.add(file);
+//        while (!q.isEmpty()) {
+//            File listFiles = q.poll();
+//            assert listFiles != null;
+//            if(listFiles.isHidden()) continue;
+//            if(listFiles.getAbsolutePath().equals("/storage/emulated/0/Android/data")
+//                    || listFiles.getAbsolutePath().equals("/storage/emulated/0/Android/obb")) continue;
+//            for (File f : Objects.requireNonNull(listFiles.listFiles())) {
+//                if (f.isDirectory()) {
+//                    q.add(f);
+//                    continue;
+//                }
+//                String name = f.getName();
+//                for (String s : docType()) {
+//                    if (name.endsWith(s)) {
+//                        String path = f.getAbsolutePath();
+//                        int size = 0;
+//                        try {
+//                            size = (int) Files.size(Paths.get(path));
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//                        String contentUri = Uri.parse(new File(path).toString()).toString();
+//                        String date = "";
+//                        try {
+//                            BasicFileAttributes attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
+//                            date = attr.lastModifiedTime().toString();
+//                        } catch (IOException e) {
+//                            e.printStackTrace();
+//                        }
+//
+//
+//                        DocumentsUtil documentsUtil = new DocumentsUtil(contentUri, size, name, bitmap, date);
+//                        list.add(documentsUtil);
+//                        break;
+//                    }
+//                }
+//
+//            }
+//        }
+//
+
         ArrayList<DocumentsUtil> list = new ArrayList<>();
 
-        // getting home file from current file
-        File file = Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(
-                context.getExternalFilesDir(null) // /storage/emulated/0/Android/data/com.amrit.practice.filesByGoogleReplica/files
-                .getParentFile()) // /storage/emulated/0/Android/data/com.amrit.practice.filesByGoogleReplica
-                .getParentFile()) // /storage/emulated/0/Android/data
-                .getParentFile()) // /storage/emulated/0/Android
-                .getParentFile(); // /storage/emulated/0
+        final String[] projection = new String[]{
+                MediaStore.Files.FileColumns._ID,
+                MediaStore.Files.FileColumns.DISPLAY_NAME,
+                MediaStore.Files.FileColumns.DATE_MODIFIED,
+                MediaStore.Files.FileColumns.SIZE,
+                MediaStore.Files.FileColumns.MIME_TYPE,
+                MediaStore.Files.FileColumns.RELATIVE_PATH
+        };
 
-        Log.e(LOG_TAG, "Process started");
+        final String sortOrder = MediaStore.Files.FileColumns.DATE_MODIFIED + " DESC";
 
-        assert file != null;
-        ArrayList<File> getAllFiles = new ArrayList<>();
-        for(File f: Objects.requireNonNull(file.listFiles())){
+        String mime = MediaStore.Files.FileColumns.MIME_TYPE;
+        final String selection = mime + " = ? OR " + mime + " = ? OR " + mime + " = ? ";
 
-            // ignroing docs from android folder
-            if(!f.getName().equals("Android")){
+        final String pdfType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("pdf");
+        final String docType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("docx");
+        final String xlsxType = MimeTypeMap.getSingleton().getMimeTypeFromExtension("xlsx");
+        final String[] selectionArgs = new String[]{pdfType, docType, xlsxType};
 
-                // if it is folder then check for all files
-                if(f.isDirectory()){
-                    getAllFiles.addAll(getDocumentFiles(Objects.requireNonNull(f.listFiles())));
-                }else{
-                    String name = file.getName();
+        try (Cursor cursor = context.getContentResolver().query(
+                MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL),
+                projection,
+                selection,
+                selectionArgs,
+                sortOrder)) {
+            assert cursor != null;
+            int idColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns._ID);
+            int sizeColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE);
+            int titleColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DISPLAY_NAME);
+            int locationColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.RELATIVE_PATH);
+            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED);
 
-                    for(String s: docType()){
-                        if(name.endsWith(s)) {
-                            getAllFiles.add(file);
-                            break;
-                        }
-                    }
-                }
-            }
-        }
+            while (cursor.moveToNext()) {
+                long id = cursor.getLong(idColumnIndex);
+                int size = cursor.getInt(sizeColumnIndex);
+                String title = cursor.getString(titleColumnIndex);
+                Uri contentUri = ContentUris.withAppendedId(MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL), id);
+                String location = cursor.getString(locationColumnIndex);
+                long date = cursor.getLong(dateColumnIndex);
 
-        // loading thumbnail for pdf files
-        for(File f: getAllFiles){
-            if(!f.getAbsolutePath().equals("/storage/emulated/0")){
-                String name = f.getName();
-                long size = f.length();
-                String uri = Uri.parse(f.getAbsolutePath()).toString();
-
-                // creating the file
-                File temp = new File(uri);
                 ParcelFileDescriptor pdf;
                 PdfRenderer pdfRenderer;
                 Bitmap bitmap = null;
                 try {
-                    pdf = ParcelFileDescriptor.open(temp, ParcelFileDescriptor.MODE_READ_ONLY);
+                    File file = new File( "/storage/emulated/0/" + location + "/" + title);
+                    Log.e(LOG_TAG, file.getAbsolutePath());
+                    pdf = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
                     pdfRenderer = new PdfRenderer(pdf);
 
                     PdfRenderer.Page page = pdfRenderer.openPage(0);
@@ -103,52 +173,15 @@ public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
                     page.close();
 
                 } catch (IOException e) {
+                    Log.e(LOG_TAG, e.toString());
                     e.printStackTrace();
                 }
+                list.add(new DocumentsUtil(contentUri.toString(), size, title, bitmap, date, location));
 
-                // adding details in list
-                DocumentsUtil documentsUtil = new DocumentsUtil(uri, size, name, bitmap);
-                list.add(documentsUtil);
             }
         }
-
-        Log.e(LOG_TAG, list.size() + "");
 
         return list;
-    }
-
-    private ArrayList<File> getDocumentFiles(File[] listFiles) {
-        ArrayList<File> result = new ArrayList<>();
-
-        for(File file: listFiles){
-            if(file.isDirectory() && !file.isHidden()){
-//                if(!file.getAbsolutePath().contains("/storage/emulated/0/WhatsApp/Media") && !file.getAbsolutePath().contains("Sent")){
-                    getDocumentFiles(Objects.requireNonNull(file.listFiles()));
-                    result.addAll(getDocumentFiles(Objects.requireNonNull(file.listFiles())));
-//                }
-
-            }else {
-                String name = file.getName();
-
-                for(String s: docType()){
-                    if(name.endsWith(s)) {
-                        result.add(file);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return result;
-    }
-
-    private static String[] docType(){
-        return new String[]{
-                ".pdf"
-                /*, ".docx", ".odt", ".rtf", ".txt", ".html", ".epub",
-                ".xlsx", ".ods", ".tsv", ".csv",
-                ".pptx", ".odp"*/
-        };
     }
 
 }

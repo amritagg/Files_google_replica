@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amrit.practice.filesbygooglereplica.R;
@@ -25,6 +27,8 @@ import com.amrit.practice.filesbygooglereplica.activities.ShowVideoActivity;
 import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -32,7 +36,6 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
 
     private final ArrayList<VideoUtil> videoUtil;
     private final Context context;
-    private Toast mToast;
     private final boolean isList;
 
     public MediaVideoAdapter(Context context, ArrayList<VideoUtil> videoUtil, boolean isList) {
@@ -57,28 +60,35 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
         return new MediaVideoViewHolder(layoutView, isList);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull MediaVideoViewHolder holder, int position) {
-        holder.nameText.setText(videoUtil.get(position).getName());
-        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        if(isList){
+            Date date = new Date(videoUtil.get(position).getDate()*1000);
+            Log.e("MediaVideoAdapter", videoUtil.get(position).getDate() + " " + position);
+            @SuppressLint("SimpleDateFormat")
+            SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy");
+            String dateText = df2.format(date);
+            String size = getSize(videoUtil.get(position).getSize());
+            setupPopup(holder, position);
+            holder.linear.setOnClickListener(view -> startVideoActivity(position));
+            holder.mediaDate.setText(dateText + ", " + size);
+        }else{
+            holder.mediaName.setShadowLayer(2, 1, 1, Color.BLACK);
+            holder.mediaSize.setShadowLayer(2, 1, 1, Color.BLACK);
+            int sizeInt = videoUtil.get(position).getSize();
+            String sizeString = getSize(sizeInt);
+            holder.mediaSize.setText(sizeString);
+            holder.relative.setOnClickListener(view -> startVideoActivity(position));
+        }
 
+        holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Uri contentUris = Uri.parse(videoUtil.get(position).getUri());
         Glide.with(context)
                 .load(contentUris)
-                .placeholder(context.getDrawable(R.drawable.ic_baseline_videocam_24))
+                .placeholder(context.getDrawable(R.drawable.ic_baseline_image_24))
                 .into(holder.imageView);
-
-        if(isList){
-            holder.linearLayout.setOnClickListener(view -> startVideoActivity(position));
-            setupPopup(holder, position);
-        }else{
-            holder.relativeLayout.setOnClickListener(view -> startVideoActivity(position));
-            holder.sizeText.setShadowLayer(2, 1, 1, Color.BLACK);
-            int sizeInt = videoUtil.get(position).getSize();
-            String sizeString = getSize(sizeInt);
-            holder.sizeText.setText(sizeString);
-        }
+        holder.mediaName.setText(videoUtil.get(position).getName());
 
     }
 
@@ -116,8 +126,8 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
 
     @SuppressLint("NonConstantResourceId")
     private void setupPopup(MediaVideoViewHolder holder, int position) {
-        holder.list_more.setOnClickListener(view -> {
-            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.list_more);
+        holder.listMore.setOnClickListener(view -> {
+            PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.listMore);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
@@ -133,13 +143,7 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
                         infoVideo(position);
                         break;
                     case R.id.delete_permanent:
-                        deleteToast();
-                        break;
-                    case R.id.yes:
-                        deleteYesToast(videoUtil.get(position).getUri());
-                        break;
-                    case R.id.no:
-                        deleteNoToast(videoUtil.get(position).getUri());
+                        deleteToast(videoUtil.get(position).getUri());
                         break;
                     default:
                         return false;
@@ -155,25 +159,16 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
         return videoUtil.size();
     }
 
-    private void deleteToast(){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "Do you really want to delete video", Toast.LENGTH_LONG);
-        mToast.show();
-    }
-
-    private void deleteYesToast(String uri){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "The file " + uri + " is deleted", Toast.LENGTH_SHORT);
-        mToast.show();
-    }
-
-    private void deleteNoToast(String uri){
-        if(mToast != null) mToast.cancel();
-        mToast = Toast.makeText(context,
-                "The file " + uri + " will not be deleted", Toast.LENGTH_SHORT);
-        mToast.show();
+    private void deleteToast(String uri){
+        new AlertDialog.Builder(context)
+                .setTitle("Delete Video")
+                .setMessage("Do You really want to delete the video")
+                .setPositiveButton("YES!!",
+                        (dialog, which) -> Toast.makeText(context, "The file " + uri + " is deleted", Toast.LENGTH_SHORT).show())
+                .setNegativeButton("NO!",
+                        (dialog, which) -> Toast.makeText(context, "The file " + uri + " will not be deleted", Toast.LENGTH_SHORT).show())
+                .create()
+                .show();
     }
 
     private void videoOpenWith(int position) {
@@ -243,24 +238,26 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
     public static class MediaVideoViewHolder extends RecyclerView.ViewHolder{
 
         ImageView imageView;
-        ImageView list_more;
-        TextView nameText;
-        TextView sizeText;
-        LinearLayout linearLayout;
-        RelativeLayout relativeLayout;
+        ImageView listMore;
+        TextView mediaName;
+        TextView mediaSize;
+        TextView mediaDate;
+        LinearLayout linear;
+        RelativeLayout relative;
 
         public MediaVideoViewHolder(@NonNull View itemView, boolean isList) {
             super(itemView);
             if(isList){
                 imageView = itemView.findViewById(R.id.list_image_view);
-                nameText = itemView.findViewById(R.id.media_name_list);
-                linearLayout = itemView.findViewById(R.id.list_linearLayout);
-                list_more = itemView.findViewById(R.id.list_more);
-            }else {
+                mediaName = itemView.findViewById(R.id.media_name_list);
+                linear = itemView.findViewById(R.id.list_linearLayout);
+                listMore = itemView.findViewById(R.id.list_more);
+                mediaDate = itemView.findViewById(R.id.media_size_date_list);
+            }else{
                 imageView = itemView.findViewById(R.id.grid_image_view);
-                nameText = itemView.findViewById(R.id.media_name_grid);
-                relativeLayout = itemView.findViewById(R.id.grid_layout);
-                sizeText = itemView.findViewById(R.id.media_size);
+                mediaName = itemView.findViewById(R.id.media_name_grid);
+                mediaSize = itemView.findViewById(R.id.media_size);
+                relative = itemView.findViewById(R.id.grid_layout);
             }
         }
     }

@@ -4,13 +4,13 @@ public class DownloadUtils {
 
     //  Required Params for the Download Files
     private String uri;
-    private long size;
+    private int size;
     private String name;
-    private String date;
+    private long date;
     private final String location;
 
     // Constructor for the same
-    public DownloadUtils(String uri, long size, String name, String date, String location) {
+    public DownloadUtils(String uri, int size, String name, long date, String location) {
         this.uri = uri;
         this.size = size;
         this.name = name;
@@ -27,7 +27,7 @@ public class DownloadUtils {
         this.uri = uri;
     }
 
-    public long getSize() {
+    public int getSize() {
         return size;
     }
 
@@ -43,11 +43,11 @@ public class DownloadUtils {
         this.name = name;
     }
 
-    public String getDate() {
+    public long getDate() {
         return date;
     }
 
-    public void setDate(String date) {
+    public void setDate(long date) {
         this.date = date;
     }
 

@@ -47,7 +47,7 @@ public class MediaVideoLoader extends AsyncTaskLoader<ArrayList<VideoUtil>> {
                 MediaStore.Video.Media._ID,
                 MediaStore.Video.Media.DISPLAY_NAME,
                 MediaStore.Video.Media.SIZE,
-                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.DATE_MODIFIED,
                 MediaStore.Audio.Media.RELATIVE_PATH
         };
 
@@ -57,14 +57,14 @@ public class MediaVideoLoader extends AsyncTaskLoader<ArrayList<VideoUtil>> {
                 projection,
                 null,
                 null,
-                MediaStore.Video.Media.DATE_ADDED + " DESC"
+                MediaStore.Video.Media.DATE_MODIFIED + " DESC"
         )) {
             assert cursor != null;
             int idColumn = cursor.getColumnIndex(MediaStore.Video.Media._ID);
             int sizeColumn = cursor.getColumnIndex(MediaStore.Video.Media.SIZE);
             int nameColumn = cursor.getColumnIndex(MediaStore.Video.Media.DISPLAY_NAME);
             int locationColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH);
-            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED);
+            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED);
 
             while (cursor.moveToNext()) {
                 long id = cursor.getLong(idColumn);

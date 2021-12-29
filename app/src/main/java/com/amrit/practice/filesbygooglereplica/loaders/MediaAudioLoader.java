@@ -50,7 +50,7 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
                 MediaStore.Audio.Media._ID,
                 MediaStore.Audio.Media.TITLE,
                 MediaStore.Audio.Media.SIZE,
-                MediaStore.Audio.Media.DATE_ADDED,
+                MediaStore.Audio.Media.DATE_MODIFIED,
                 MediaStore.Audio.Media.RELATIVE_PATH
         };
 
@@ -67,7 +67,7 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
             int sizeColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.SIZE);
             int titleColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.TITLE);
             int locationColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.RELATIVE_PATH);
-            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED);
+            int dateColumnIndex = cursor.getColumnIndex(MediaStore.Audio.Media.DATE_MODIFIED);
 
             while (cursor.moveToNext()){
                 long id = cursor.getLong(idColumnIndex);

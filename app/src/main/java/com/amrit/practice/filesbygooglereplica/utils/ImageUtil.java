@@ -7,7 +7,7 @@ public class ImageUtil {
     private int size;
     private String name;
     private long date;
-    private final String location;
+    private final String path;
 
     // Constructor for the same
     public ImageUtil(String uri, int size, String name, long date, String location) {
@@ -15,7 +15,7 @@ public class ImageUtil {
         this.size = size;
         this.name = name;
         this.date = date;
-        this.location = location;
+        this.path = location;
     }
 
     // Getters to get the values
@@ -51,8 +51,8 @@ public class ImageUtil {
         this.date = date;
     }
 
-    public String getLocation() {
-        return location;
+    public String getPath() {
+        return path;
     }
 
     public static boolean isImage(String name){
