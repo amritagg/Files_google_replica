@@ -6,12 +6,17 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -20,7 +25,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
+import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
+import com.amrit.practice.filesbygooglereplica.Models.DocumentsUtil;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaDocAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaDocLoader;
 import com.amrit.practice.filesbygooglereplica.R;
@@ -42,6 +48,7 @@ public class MediaDocumentsActivity extends AppCompatActivity
     private ArrayList<DocumentsUtil> documentsUtils;
     private MediaDocAdapter mediaDocAdapter;
     private boolean isList = false;
+    private BottomSheetDialog bottomSheetDialog;
 
     @RequiresApi(api = Build.VERSION_CODES.R)
     @Override
@@ -50,6 +57,20 @@ public class MediaDocumentsActivity extends AppCompatActivity
         setContentView(R.layout.activity_media);
         initialiseRecyclerView();
         showDocuments();
+        LocalBroadcastManager.getInstance(this).registerReceiver(sortReceiver,
+                new IntentFilter(BottomSheetDialog.DOCUMENT_TAG));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("list", documentsUtils);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        documentsUtils = savedInstanceState.getParcelableArrayList("list");
     }
 
     private void showDocuments() {
@@ -73,7 +94,7 @@ public class MediaDocumentsActivity extends AppCompatActivity
 
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
-        documentsUtils.addAll(data);
+        if(documentsUtils.isEmpty()) documentsUtils.addAll(data);
         recyclerView.setVisibility(View.VISIBLE);
         mediaDocAdapter.notifyDataSetChanged();
     }
@@ -91,31 +112,11 @@ public class MediaDocumentsActivity extends AppCompatActivity
     @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.sort_date) {
-            ArrayList<DocumentsUtil> temp = new ArrayList<>(documentsUtils);
-            documentsUtils.sort(Comparator.comparing(DocumentsUtil::getDate));
-
-            if(documentsUtils.equals(temp)) Collections.reverse(documentsUtils);
-            mediaDocAdapter.notifyDataSetChanged();
-
+        if (item.getItemId() == R.id.sort_by) {
+            bottomSheetDialog = new BottomSheetDialog(this, BottomSheetDialog.DOCUMENT_TAG);
+            bottomSheetDialog.show(getSupportFragmentManager(), "ModelBottomSheet");
             return true;
-        }else if (item.getItemId() == R.id.sort_name){
-            ArrayList<DocumentsUtil> temp = new ArrayList<>(documentsUtils);
-            documentsUtils.sort(Comparator.comparing(DocumentsUtil::getName));
-
-            if(documentsUtils.equals(temp)) Collections.reverse(documentsUtils);
-            mediaDocAdapter.notifyDataSetChanged();
-
-            return true;
-        }else if(item.getItemId() == R.id.sort_size){
-            ArrayList<DocumentsUtil> temp = new ArrayList<>(documentsUtils);
-            documentsUtils.sort(Comparator.comparingInt(DocumentsUtil::getSize));
-
-            if(documentsUtils.equals(temp)) Collections.reverse(documentsUtils);
-            mediaDocAdapter.notifyDataSetChanged();
-
-            return true;
-        } else if (item.getItemId() == R.id.list_grid) {
+        }  else if (item.getItemId() == R.id.list_grid) {
             RecyclerView.LayoutManager layoutManager;
 
             if (isList) {
@@ -157,5 +158,38 @@ public class MediaDocumentsActivity extends AppCompatActivity
         mediaDocAdapter = new MediaDocAdapter(this, documentsUtils, isList);
         recyclerView.setAdapter(mediaDocAdapter);
     }
+
+    public BroadcastReceiver sortReceiver = new BroadcastReceiver() {
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tag = intent.getStringExtra(BottomSheetDialog.TAG);
+            switch (tag) {
+                case BottomSheetDialog.LARGEST_FIRST:
+                    documentsUtils.sort(Comparator.comparingInt(DocumentsUtil::getSize));
+                    Collections.reverse(documentsUtils);
+                    break;
+                case BottomSheetDialog.SMALLEST_FIRST:
+                    documentsUtils.sort(Comparator.comparingInt(DocumentsUtil::getSize));
+                    break;
+                case BottomSheetDialog.NEWEST_FIRST:
+                    documentsUtils.sort(Comparator.comparingLong(DocumentsUtil::getDate));
+                    Collections.reverse(documentsUtils);
+                    break;
+                case BottomSheetDialog.OLDEST_FIRST:
+                    documentsUtils.sort(Comparator.comparingLong(DocumentsUtil::getDate));
+                    break;
+                case BottomSheetDialog.A_TO_Z:
+                    documentsUtils.sort(Comparator.comparing(DocumentsUtil::getName));
+                    break;
+                case BottomSheetDialog.Z_TO_A:
+                    documentsUtils.sort(Comparator.comparing(DocumentsUtil::getName));
+                    Collections.reverse(documentsUtils);
+                    break;
+            }
+            mediaDocAdapter.notifyDataSetChanged();
+            bottomSheetDialog.dismiss();
+        }
+    };
 
 }

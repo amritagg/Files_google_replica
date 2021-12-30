@@ -5,23 +5,32 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+
+import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaImageLoader;
-import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.Models.ImageUtil;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,6 +45,7 @@ public class MediaImageActivity extends AppCompatActivity
     private ArrayList<ImageUtil> imageUtils;
     private MediaImageAdapter imageAdapter;
     private boolean isList = false;
+    private BottomSheetDialog bottomSheetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +53,21 @@ public class MediaImageActivity extends AppCompatActivity
         setContentView(R.layout.activity_media);
         initialiseRecyclerView();
         startGallery();
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(sortReceiver,
+                new IntentFilter(BottomSheetDialog.IMAGE_TAG));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("list", imageUtils);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        imageUtils = savedInstanceState.getParcelableArrayList("list");
     }
 
     public void startGallery() {
@@ -66,13 +91,14 @@ public class MediaImageActivity extends AppCompatActivity
 
         Log.e(LOG_TAG, "Done onLoadFinished");
         progressBar.setVisibility(View.GONE);
-        imageUtils.addAll(data);
+        if (imageUtils.isEmpty()) imageUtils.addAll(data);
         recyclerView.setVisibility(View.VISIBLE);
         imageAdapter.notifyDataSetChanged();
     }
 
     @Override
-    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader) { }
+    public void onLoaderReset(@NonNull @NotNull Loader<ArrayList<ImageUtil>> loader) {
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -83,40 +109,20 @@ public class MediaImageActivity extends AppCompatActivity
     @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.sort_date){
-            ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
-            imageUtils.sort(Comparator.comparingLong(ImageUtil::getDate));
-
-            if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
-            imageAdapter.notifyDataSetChanged();
-
+        if (item.getItemId() == R.id.sort_by) {
+            bottomSheetDialog = new BottomSheetDialog(this, BottomSheetDialog.IMAGE_TAG);
+            bottomSheetDialog.show(getSupportFragmentManager(), "ModelBottomSheet");
             return true;
-        }else if (item.getItemId() == R.id.sort_name){
-            ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
-            imageUtils.sort(Comparator.comparing(ImageUtil::getName));
-
-            if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
-            imageAdapter.notifyDataSetChanged();
-
-            return true;
-        }else if(item.getItemId() == R.id.sort_size){
-            ArrayList<ImageUtil> temp = new ArrayList<>(imageUtils);
-            imageUtils.sort(Comparator.comparingInt(ImageUtil::getSize));
-
-            if(imageUtils.equals(temp)) Collections.reverse(imageUtils);
-            imageAdapter.notifyDataSetChanged();
-
-            return true;
-        } else if(item.getItemId() == android.R.id.home) {
+        } else if (item.getItemId() == android.R.id.home) {
             finish();
             return true;
-        }else if(item.getItemId() == R.id.list_grid){
+        } else if (item.getItemId() == R.id.list_grid) {
             RecyclerView.LayoutManager layoutManager;
 
-            if(isList){
+            if (isList) {
                 layoutManager = new GridLayoutManager(this, 2);
                 item.setIcon(getDrawable(R.drawable.ic_baseline_view_list_24));
-            }else{
+            } else {
                 layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
                 recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
                 item.setIcon(getDrawable(R.drawable.ic_baseline_view_grid_24));
@@ -131,23 +137,56 @@ public class MediaImageActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    private void initialiseRecyclerView(){
+    private void initialiseRecyclerView() {
         progressBar = findViewById(R.id.media_progress_bar);
         recyclerView = findViewById(R.id.media_recycler_view);
         recyclerView.setVisibility(View.GONE);
         imageUtils = new ArrayList<>();
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(false);
-        if(isList){
+        if (isList) {
             RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
             recyclerView.setLayoutManager(linearLayoutManager);
             recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        }else{
+        } else {
             RecyclerView.LayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
             recyclerView.setLayoutManager(gridLayoutManager);
         }
         imageAdapter = new MediaImageAdapter(this, imageUtils, isList);
         recyclerView.setAdapter(imageAdapter);
     }
+
+    public BroadcastReceiver sortReceiver = new BroadcastReceiver() {
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tag = intent.getStringExtra(BottomSheetDialog.TAG);
+            switch (tag) {
+                case BottomSheetDialog.LARGEST_FIRST:
+                    imageUtils.sort(Comparator.comparingInt(ImageUtil::getSize));
+                    Collections.reverse(imageUtils);
+                    break;
+                case BottomSheetDialog.SMALLEST_FIRST:
+                    imageUtils.sort(Comparator.comparingInt(ImageUtil::getSize));
+                    break;
+                case BottomSheetDialog.NEWEST_FIRST:
+                    imageUtils.sort(Comparator.comparingLong(ImageUtil::getDate));
+                    Collections.reverse(imageUtils);
+                    break;
+                case BottomSheetDialog.OLDEST_FIRST:
+                    imageUtils.sort(Comparator.comparingLong(ImageUtil::getDate));
+                    break;
+                case BottomSheetDialog.A_TO_Z:
+                    imageUtils.sort(Comparator.comparing(ImageUtil::getName));
+                    break;
+                case BottomSheetDialog.Z_TO_A:
+                    imageUtils.sort(Comparator.comparing(ImageUtil::getName));
+                    Collections.reverse(imageUtils);
+                    break;
+            }
+            imageAdapter.notifyDataSetChanged();
+            bottomSheetDialog.dismiss();
+        }
+    };
 
 }

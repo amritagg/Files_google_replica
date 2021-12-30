@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,9 +20,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.MediaDocumentsActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowPdfActivity;
-import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
+import com.amrit.practice.filesbygooglereplica.Models.DocumentsUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;

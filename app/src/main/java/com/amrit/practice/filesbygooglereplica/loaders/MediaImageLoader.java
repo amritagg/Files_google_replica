@@ -6,16 +6,18 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.Models.ImageUtil;
 
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
-public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
+public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>> {
 
     private final Context context;
     private final String LOG_TAG = MediaImageLoader.class.getSimpleName();
@@ -77,8 +79,8 @@ public class MediaImageLoader extends AsyncTaskLoader<ArrayList<ImageUtil>>{
                 String location = cursor.getString(locationColumn);
 
                 // adding the details in list
-               ImageUtil imageUtil = new ImageUtil(contentUri.toString(), size, name, date, location);
-               list.add(imageUtil);
+                ImageUtil imageUtil = new ImageUtil(contentUri.toString(), size, name, date, location);
+                list.add(imageUtil);
 
             }
         } catch (Exception e) {

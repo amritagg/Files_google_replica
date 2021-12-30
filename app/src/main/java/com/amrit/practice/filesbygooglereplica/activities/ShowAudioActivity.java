@@ -1,10 +1,16 @@
 package com.amrit.practice.filesbygooglereplica.activities;
 
-import androidx.appcompat.app.AppCompatActivity;
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.amrit.practice.filesbygooglereplica.R;
 import com.google.android.exoplayer2.MediaItem;
@@ -13,6 +19,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -29,9 +36,10 @@ public class ShowAudioActivity extends AppCompatActivity {
     private long playbackPosition = 0;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_show_audio);
+
         playerView = findViewById(R.id.player_view);
 
         Button share = findViewById(R.id.audio_share);
@@ -53,9 +61,27 @@ public class ShowAudioActivity extends AppCompatActivity {
     }
 
     private void shareAudio() {
+        Uri uri = Uri.parse(audioUris.get(position));
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        sendIntent.setType("audio/*");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(shareIntent);
     }
 
     private void deleteAudio() {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Image")
+                .setMessage("Do You really want to delete the audio")
+                .setPositiveButton("YES!!",
+                        (dialog, which) -> Toast.makeText(this, "The file " + audioUris.get(position) + " is deleted", Toast.LENGTH_SHORT).show())
+                .setNegativeButton("NO!",
+                        (dialog, which) -> Toast.makeText(this, "The file " + audioUris.get(position) + " will not be deleted", Toast.LENGTH_SHORT).show())
+                .create()
+                .show();
     }
 
     private void infoAudio() {
@@ -64,12 +90,16 @@ public class ShowAudioActivity extends AppCompatActivity {
         Intent intent = new Intent(this, InfoActivity.class);
         Bundle bundle = new Bundle();
 
-        Date date = new Date(audio_dates[n]*1000);
+        Date date = new Date(audio_dates[n]);
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy, hh:mm:aa");
+        String dateText = df2.format(date);
         bundle.putString("uri", audioUris.get(n));
         bundle.putString("name", audioNames.get(n));
         bundle.putString("location", audioLocations.get(n));
-        bundle.putString("time", date.toString());
+        bundle.putString("time", dateText);
         bundle.putString("size", getSize(audioSize.get(n)));
+        bundle.putInt("isMedia", 1);
         intent.putExtra("INFO", bundle);
         startActivity(intent);
 

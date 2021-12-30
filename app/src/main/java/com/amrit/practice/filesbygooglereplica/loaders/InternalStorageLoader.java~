@@ -51,10 +51,12 @@ public class InternalStorageLoader extends AsyncTaskLoader<ArrayList<InternalSto
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            long date = 0;
+            String date = "";
             try {
                 BasicFileAttributes attr = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
-                date = attr.lastModifiedTime().toMillis();
+                @SuppressLint("SimpleDateFormat")
+                SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy");
+                date = df2.format( attr.lastModifiedTime().toMillis() );
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,4 @@
-package com.amrit.practice.filesbygooglereplica;
+package com.amrit.practice.filesbygooglereplica.utilities;
 
 import android.view.View;
 import androidx.viewpager2.widget.ViewPager2;

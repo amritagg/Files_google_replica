@@ -16,7 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.utils.DownloadUtils;
+import com.amrit.practice.filesbygooglereplica.Models.DownloadUtils;
 import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;

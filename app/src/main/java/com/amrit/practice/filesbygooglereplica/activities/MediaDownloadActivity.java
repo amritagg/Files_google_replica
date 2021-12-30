@@ -5,23 +5,26 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.GridView;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 
-import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
-import com.amrit.practice.filesbygooglereplica.utils.DownloadUtils;
+import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
+import com.amrit.practice.filesbygooglereplica.Models.DownloadUtils;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaDownloadAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaDownloadLoader;
 import com.amrit.practice.filesbygooglereplica.R;
@@ -41,6 +44,7 @@ public class MediaDownloadActivity extends AppCompatActivity
     private MediaDownloadAdapter downloadAdapter;
     private ArrayList<DownloadUtils> downloadUtils;
     private boolean isList = false;
+    private BottomSheetDialog bottomSheetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +53,20 @@ public class MediaDownloadActivity extends AppCompatActivity
 
         initialiseRecyclerView();
         showDownloads();
+        LocalBroadcastManager.getInstance(this).registerReceiver(sortReceiver,
+                new IntentFilter(BottomSheetDialog.DOWNLOAD_TAG));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("list", downloadUtils);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        downloadUtils = savedInstanceState.getParcelableArrayList("list");
     }
 
     private void showDownloads(){
@@ -72,7 +90,7 @@ public class MediaDownloadActivity extends AppCompatActivity
 
         Log.e(LOG_TAG, "Done onLoadFinished");
         progressBar.setVisibility(View.GONE);
-        downloadUtils.addAll(data);
+        if(downloadUtils.isEmpty()) downloadUtils.addAll(data);
         recyclerView.setVisibility(View.VISIBLE);
         downloadAdapter.notifyDataSetChanged();
 
@@ -90,31 +108,11 @@ public class MediaDownloadActivity extends AppCompatActivity
     @SuppressLint({"UseCompatLoadingForDrawables", "NotifyDataSetChanged"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.sort_date){
-            ArrayList<DownloadUtils> temp = new ArrayList<>(downloadUtils);
-            downloadUtils.sort(Comparator.comparingLong(DownloadUtils::getDate));
-
-            if(downloadUtils.equals(temp)) Collections.reverse(downloadUtils);
-            downloadAdapter.notifyDataSetChanged();
-
+        if (item.getItemId() == R.id.sort_by) {
+            bottomSheetDialog = new BottomSheetDialog(this, BottomSheetDialog.DOWNLOAD_TAG);
+            bottomSheetDialog.show(getSupportFragmentManager(), "ModelBottomSheet");
             return true;
-        }else if(item.getItemId() == R.id.sort_name){
-            ArrayList<DownloadUtils> temp = new ArrayList<>(downloadUtils);
-            downloadUtils.sort(Comparator.comparing(DownloadUtils::getName));
-
-            if(downloadUtils.equals(temp)) Collections.reverse(downloadUtils);
-            downloadAdapter.notifyDataSetChanged();
-
-            return true;
-        }else if(item.getItemId() == R.id.sort_size){
-            ArrayList<DownloadUtils> temp = new ArrayList<>(downloadUtils);
-            downloadUtils.sort(Comparator.comparingInt(DownloadUtils::getSize));
-
-            if(downloadUtils.equals(temp)) Collections.reverse(downloadUtils);
-            downloadAdapter.notifyDataSetChanged();
-
-            return true;
-        }else if(item.getItemId() == android.R.id.home){
+        } else if(item.getItemId() == android.R.id.home){
             finish();
             return true;
         }else if(item.getItemId() == R.id.list_grid){
@@ -156,5 +154,38 @@ public class MediaDownloadActivity extends AppCompatActivity
         downloadAdapter = new MediaDownloadAdapter(this, downloadUtils, isList);
         recyclerView.setAdapter(downloadAdapter);
     }
+
+    public BroadcastReceiver sortReceiver = new BroadcastReceiver() {
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tag = intent.getStringExtra(BottomSheetDialog.TAG);
+            switch (tag) {
+                case BottomSheetDialog.LARGEST_FIRST:
+                    downloadUtils.sort(Comparator.comparingInt(DownloadUtils::getSize));
+                    Collections.reverse(downloadUtils);
+                    break;
+                case BottomSheetDialog.SMALLEST_FIRST:
+                    downloadUtils.sort(Comparator.comparingInt(DownloadUtils::getSize));
+                    break;
+                case BottomSheetDialog.NEWEST_FIRST:
+                    downloadUtils.sort(Comparator.comparingLong(DownloadUtils::getDate));
+                    Collections.reverse(downloadUtils);
+                    break;
+                case BottomSheetDialog.OLDEST_FIRST:
+                    downloadUtils.sort(Comparator.comparingLong(DownloadUtils::getDate));
+                    break;
+                case BottomSheetDialog.A_TO_Z:
+                    downloadUtils.sort(Comparator.comparing(DownloadUtils::getName));
+                    break;
+                case BottomSheetDialog.Z_TO_A:
+                    downloadUtils.sort(Comparator.comparing(DownloadUtils::getName));
+                    Collections.reverse(downloadUtils);
+                    break;
+            }
+            downloadAdapter.notifyDataSetChanged();
+            bottomSheetDialog.dismiss();
+        }
+    };
 
 }

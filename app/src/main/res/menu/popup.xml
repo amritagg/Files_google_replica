@@ -16,19 +16,6 @@
 
     <item android:id="@+id/delete_permanent"
         android:title="@string/delete_permanently"
-        app:showAsAction="never" >
-
-        <menu>
-
-            <item
-                android:id="@+id/yes"
-                android:title="@string/yes" />
-            <item
-                android:id="@+id/no"
-                android:title="@string/no" />
-
-        </menu>
-
-    </item>
+        app:showAsAction="never" />
 
 </menu>

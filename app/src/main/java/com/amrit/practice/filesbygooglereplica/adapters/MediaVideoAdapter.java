@@ -24,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowVideoActivity;
-import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.Models.VideoUtil;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
 
@@ -200,27 +200,20 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
         Bundle bundle = new Bundle();
 
         Date date = new Date(videoUtil.get(position).getDate()*1000);
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy, hh:mm:aa");
+        String dateText = df2.format(date);
         bundle.putString("uri", videoUtil.get(position).getUri());
         bundle.putString("name", videoUtil.get(position).getName());
         bundle.putString("location", videoUtil.get(position).getLocation());
-        bundle.putString("time", date.toString());
+        bundle.putString("time", dateText);
         bundle.putString("size", getSize(videoUtil.get(position).getSize()));
+        bundle.putInt("isMedia", 2);
         intent.putExtra("INFO", bundle);
+
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
 
-//        Intent intent = new Intent(context, videoInfoActivity.class);
-//        Bundle bundle = new Bundle();
-//
-//        Date date = new Date(videoUtil.get(position).getDate() * 1000);
-//        bundle.putString("uri", videoUtil.get(position).getUri());
-//        bundle.putString("name", videoUtil.get(position).getName());
-//        bundle.putString("location", videoUtil.get(position).getLocation());
-//        bundle.putString("time", date.toString());
-//        bundle.putString("size", getSize(videoUtil.get(position).getSize()));
-//        intent.putExtra("INFO", bundle);
-//        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//        context.startActivity(intent);
     }
 
     @NotNull

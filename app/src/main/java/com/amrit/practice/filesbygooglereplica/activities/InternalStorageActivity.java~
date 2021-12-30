@@ -303,7 +303,7 @@ public class InternalStorageActivity extends AppCompatActivity
         bundle.putInt("current_position", current);
 
         Intent intent = new Intent(InternalStorageActivity.this, ShowVideoActivity.class);
-        intent.putExtra("from_internal", bundle);
+        intent.putExtra("INFO", bundle);
         startActivity(intent);
     }
 

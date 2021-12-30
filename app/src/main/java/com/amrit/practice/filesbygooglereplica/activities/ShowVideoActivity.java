@@ -1,10 +1,15 @@
 package com.amrit.practice.filesbygooglereplica.activities;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
 import com.google.android.exoplayer2.MediaItem;
@@ -13,6 +18,7 @@ import com.google.android.exoplayer2.ui.PlayerView;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -27,6 +33,7 @@ public class ShowVideoActivity extends AppCompatActivity {
     private boolean playWhenReady = true;
     private int currentWindow = 0;
     private long playbackPosition = 0;
+    private boolean isMedia = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +46,14 @@ public class ShowVideoActivity extends AppCompatActivity {
         Button info = findViewById(R.id.video_info);
 
         Intent intent = getIntent();
-        Bundle bundle = intent.getBundleExtra("INFO");
+        Bundle bundle;
+        if(intent.hasExtra("INFO")) {
+            bundle = intent.getBundleExtra("INFO");
+            isMedia = true;
+        } else {
+            bundle = intent.getBundleExtra("from_internal");
+            isMedia = false;
+        }
         videoUris = bundle.getStringArrayList("video_uris");
         position = bundle.getInt("current_position");
         video_dates = bundle.getLongArray("video_date");
@@ -53,9 +67,27 @@ public class ShowVideoActivity extends AppCompatActivity {
     }
 
     private void shareVideo() {
+        Uri uri = Uri.parse(videoUris.get(position));
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        sendIntent.setType("video/*");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(shareIntent);
     }
 
     private void deleteVideo() {
+        new AlertDialog.Builder(this)
+                .setTitle("Delete Video")
+                .setMessage("Do You really want to delete the video")
+                .setPositiveButton("YES!!",
+                        (dialog, which) -> Toast.makeText(this, "The file " + videoUris.get(position) + " is deleted", Toast.LENGTH_SHORT).show())
+                .setNegativeButton("NO!",
+                        (dialog, which) -> Toast.makeText(this, "The file " + videoUris.get(position) + " will not be deleted", Toast.LENGTH_SHORT).show())
+                .create()
+                .show();
     }
 
     private void infoVideo() {
@@ -64,12 +96,17 @@ public class ShowVideoActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
 
         Date date = new Date(video_dates[n]*1000);
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy, hh:mm:aa");
+        String dateText = df2.format(date);
         bundle.putString("uri", videoUris.get(n));
         bundle.putString("name", videoNames.get(n));
         bundle.putString("location", videoLocation.get(n));
-        bundle.putString("time", date.toString());
+        bundle.putString("time", dateText);
         bundle.putString("size", getSize(videoSize.get(n)));
+        bundle.putInt("isMedia", (isMedia) ? 2 : 6);
         intent.putExtra("INFO", bundle);
+
         startActivity(intent);
     }
 

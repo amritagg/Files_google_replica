@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
+import com.amrit.practice.filesbygooglereplica.Models.AudioUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -81,15 +81,15 @@ public class MediaAudioLoader extends AsyncTaskLoader<ArrayList<AudioUtil>> {
 
                 // loading bitmap
                 Bitmap bitmap = null;
-                try {
-                    bitmap = context.getContentResolver().loadThumbnail(
-                            contentUri,
-                            new Size(200, 200),
-                            null
-                    );
-                } catch (IOException e) {
-                    Log.e(LOG_TAG, "Bitmap not available");
-                }
+//                try {
+//                    bitmap = context.getContentResolver().loadThumbnail(
+//                            contentUri,
+//                            new Size(200, 200),
+//                            null
+//                    );
+//                } catch (IOException e) {
+//                    Log.e(LOG_TAG, "Bitmap not available");
+//                }
 
                 // adding details in list
                 audioUtil = new AudioUtil(contentUri.toString(), size, title, bitmap, location, date);

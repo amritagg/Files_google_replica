@@ -29,6 +29,11 @@
     <string name="by_date">By Date</string>
     <string name="by_size">By Size</string>
     <string name="open_camera">Open camera</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="name_a_z">Name A → Z</string>
+    <string name="name_z_a">Name Z → A</string>
+    <string name="smallest_first">Smallest first</string>
+    <string name="largest_first">Largest first</string>
+    <string name="oldest_first">Oldest first</string>
+    <string name="newest_first">Newest first</string>
+
 </resources>

@@ -5,18 +5,25 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
+
+import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
+import com.amrit.practice.filesbygooglereplica.Models.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaAudioLoader;
 import com.amrit.practice.filesbygooglereplica.R;
@@ -36,6 +43,7 @@ public class MediaAudioActivity extends AppCompatActivity
     private ArrayList<AudioUtil> audioUtil;
     private MediaAudioAdapter audioAdapter;
     private boolean isList  = false;
+    private BottomSheetDialog bottomSheetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,20 @@ public class MediaAudioActivity extends AppCompatActivity
 
         initialiseRecyclerView();
         showAudio();
+        LocalBroadcastManager.getInstance(this).registerReceiver(sortReceiver,
+                new IntentFilter(BottomSheetDialog.AUDIO_TAG));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("list", audioUtil);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        audioUtil = savedInstanceState.getParcelableArrayList("list");
     }
 
     private void showAudio() {
@@ -67,7 +89,7 @@ public class MediaAudioActivity extends AppCompatActivity
 
         Log.e(LOG_TAG, "Done onLoadFinished");
         progressBar.setVisibility(View.GONE);
-        audioUtil.addAll(data);
+        if(audioUtil.isEmpty()) audioUtil.addAll(data);
         recyclerView.setVisibility(View.VISIBLE);
         audioAdapter.notifyDataSetChanged();
     }
@@ -84,29 +106,9 @@ public class MediaAudioActivity extends AppCompatActivity
     @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.sort_date) {
-            ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
-            audioUtil.sort(Comparator.comparingLong(AudioUtil::getDate));
-
-            if (audioUtil.equals(temp)) Collections.reverse(audioUtil);
-            audioAdapter.notifyDataSetChanged();
-
-            return true;
-        } else if (item.getItemId() == R.id.sort_name) {
-            ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
-            audioUtil.sort(Comparator.comparing(AudioUtil::getName));
-
-            if (audioUtil.equals(temp)) Collections.reverse(audioUtil);
-            audioAdapter.notifyDataSetChanged();
-
-            return true;
-        } else if (item.getItemId() == R.id.sort_size) {
-            ArrayList<AudioUtil> temp = new ArrayList<>(audioUtil);
-            audioUtil.sort(Comparator.comparingInt(AudioUtil::getSize));
-
-            if (audioUtil.equals(temp)) Collections.reverse(audioUtil);
-            audioAdapter.notifyDataSetChanged();
-
+        if (item.getItemId() == R.id.sort_by) {
+            bottomSheetDialog = new BottomSheetDialog(this, BottomSheetDialog.AUDIO_TAG);
+            bottomSheetDialog.show(getSupportFragmentManager(), "ModelBottomSheet");
             return true;
         } else if (item.getItemId() == android.R.id.home) {
             finish();
@@ -123,7 +125,7 @@ public class MediaAudioActivity extends AppCompatActivity
             }
             recyclerView.setLayoutManager(layoutManager);
             isList = !isList;
-            audioAdapter = new MediaAudioAdapter(this, audioUtil, isList);
+            audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
             recyclerView.setAdapter(audioAdapter);
 
             return true;
@@ -145,8 +147,41 @@ public class MediaAudioActivity extends AppCompatActivity
 
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.addItemDecoration(new DividerItemDecoration(recyclerView.getContext(), DividerItemDecoration.VERTICAL));
-        audioAdapter = new MediaAudioAdapter(this, audioUtil, isList);
+        audioAdapter = new MediaAudioAdapter(getApplicationContext(), audioUtil, isList);
         recyclerView.setAdapter(audioAdapter);
     }
+
+    public BroadcastReceiver sortReceiver = new BroadcastReceiver() {
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tag = intent.getStringExtra(BottomSheetDialog.TAG);
+            switch (tag) {
+                case BottomSheetDialog.LARGEST_FIRST:
+                    audioUtil.sort(Comparator.comparingInt(AudioUtil::getSize));
+                    Collections.reverse(audioUtil);
+                    break;
+                case BottomSheetDialog.SMALLEST_FIRST:
+                    audioUtil.sort(Comparator.comparingInt(AudioUtil::getSize));
+                    break;
+                case BottomSheetDialog.NEWEST_FIRST:
+                    audioUtil.sort(Comparator.comparingLong(AudioUtil::getDate));
+                    Collections.reverse(audioUtil);
+                    break;
+                case BottomSheetDialog.OLDEST_FIRST:
+                    audioUtil.sort(Comparator.comparingLong(AudioUtil::getDate));
+                    break;
+                case BottomSheetDialog.A_TO_Z:
+                    audioUtil.sort(Comparator.comparing(AudioUtil::getName));
+                    break;
+                case BottomSheetDialog.Z_TO_A:
+                    audioUtil.sort(Comparator.comparing(AudioUtil::getName));
+                    Collections.reverse(audioUtil);
+                    break;
+            }
+            audioAdapter.notifyDataSetChanged();
+            bottomSheetDialog.dismiss();
+        }
+    };
 
 }

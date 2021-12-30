@@ -16,20 +16,23 @@ import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
+import com.amrit.practice.filesbygooglereplica.Models.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.activities.ShowAudioActivity;
-import com.amrit.practice.filesbygooglereplica.utils.AudioUtil;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.MediaAudioViewHolder>{
+public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.MediaAudioViewHolder> {
 
     public final String LOG_TAG = MediaAudioAdapter.class.getSimpleName();
     private final ArrayList<AudioUtil> audioUtils;
@@ -47,8 +50,10 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
     @SuppressLint("InflateParams")
     public MediaAudioViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView;
-        if(isList) layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
-        else layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_media, null, false);
+        if (isList)
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
+        else
+            layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_media, null, false);
 
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
@@ -59,8 +64,8 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
     @SuppressLint({"SetTextI18n", "UseCompatLoadingForDrawables"})
     @Override
     public void onBindViewHolder(@NonNull MediaAudioViewHolder holder, int position) {
-        if(isList){
-            Date date = new Date(audioUtils.get(position).getDate()*1000);
+        if (isList) {
+            Date date = new Date(audioUtils.get(position).getDate() * 1000);
             @SuppressLint("SimpleDateFormat")
             SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy");
             String dateText = df2.format(date);
@@ -68,7 +73,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
             setUpPop(holder, position);
             holder.linear.setOnClickListener(view -> startAudioActivity(position));
             holder.mediaDate.setText(dateText + ", " + size);
-        }else{
+        } else {
             holder.mediaName.setShadowLayer(2, 1, 1, Color.BLACK);
             holder.mediaSize.setShadowLayer(2, 1, 1, Color.BLACK);
             int sizeInt = audioUtils.get(position).getSize();
@@ -80,12 +85,12 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
         holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Bitmap bitmap = audioUtils.get(position).getBitmap();
 
-        if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
+        if (bitmap != null) holder.imageView.setImageBitmap(bitmap);
         else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_audiotrack_24));
 
         holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         String name = audioUtils.get(position).getName();
-        if(name.length() > 0) holder.mediaName.setText(name);
+        if (name.length() > 0) holder.mediaName.setText(name);
         else holder.mediaName.setText("Residue file you must delete it");
     }
 
@@ -94,7 +99,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
         return audioUtils.size();
     }
 
-    private void startAudioActivity(int position){
+    private void startAudioActivity(int position) {
         Intent intent = new Intent(context, ShowAudioActivity.class);
         ArrayList<String> audioUris = new ArrayList<>();
         ArrayList<String> audioNames = new ArrayList<>();
@@ -102,7 +107,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
         ArrayList<String> audioLocation = new ArrayList<>();
         ArrayList<Long> audioDate = new ArrayList<>();
 
-        for(AudioUtil util: audioUtils) {
+        for (AudioUtil util : audioUtils) {
             audioUris.add(util.getUri());
             audioNames.add(util.getName());
             audioSize.add(util.getSize());
@@ -112,7 +117,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
 
         long[] audio_date = new long[audioDate.size()];
 
-        for(int j = 0; j < audioDate.size(); j++) audio_date[j] = audioDate.get(j);
+        for (int j = 0; j < audioDate.size(); j++) audio_date[j] = audioDate.get(j);
 
         Bundle bundle = new Bundle();
         bundle.putStringArrayList("uris", audioUris);
@@ -120,21 +125,22 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
         bundle.putStringArrayList("names", audioNames);
         bundle.putIntegerArrayList("size", audioSize);
         bundle.putLongArray("dates", audio_date);
-
         bundle.putInt("position", position);
+
         intent.putExtra("INFO", bundle);
 
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void setUpPop(MediaAudioViewHolder holder, int position){
+    private void setUpPop(MediaAudioViewHolder holder, int position) {
         holder.listMore.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.listMore);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
 
             popupMenu.setOnMenuItemClickListener(menuItem -> {
-                switch (menuItem.getItemId()){
+                switch (menuItem.getItemId()) {
                     case R.id.share:
                         shareAudio(audioUtils.get(position).getUri());
                         break;
@@ -156,7 +162,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
         });
     }
 
-    private void deleteToast(String uri){
+    private void deleteToast(String uri) {
         new AlertDialog.Builder(context)
                 .setTitle("Delete Image")
                 .setMessage("Do You really want to delete the audio")
@@ -196,31 +202,33 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
         Intent intent = new Intent(context, InfoActivity.class);
         Bundle bundle = new Bundle();
 
-        Date date = new Date(audioUtils.get(position).getDate()*1000);
+        Date date = new Date(audioUtils.get(position).getDate() * 1000);
         bundle.putString("uri", audioUtils.get(position).getUri());
         bundle.putString("name", audioUtils.get(position).getName());
         bundle.putString("location", audioUtils.get(position).getLocation());
         bundle.putString("time", date.toString());
         bundle.putString("size", getSize(audioUtils.get(position).getSize()));
+        bundle.putInt("isMedia", 1);
         intent.putExtra("INFO", bundle);
+
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
 
     }
 
     @NotNull
-    private String getSize(int size){
+    private String getSize(int size) {
         float sizeFloat = (float) size / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
 
-        if(sizeFloat < 1024) return sizeFloat + "KB";
+        if (sizeFloat < 1024) return sizeFloat + "KB";
 
         sizeFloat = sizeFloat / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
         return sizeFloat + "MB";
     }
 
-    public static class MediaAudioViewHolder extends RecyclerView.ViewHolder{
+    public static class MediaAudioViewHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
         ImageView listMore;
@@ -232,7 +240,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
 
         public MediaAudioViewHolder(@NonNull View itemView, boolean isList) {
             super(itemView);
-            if(isList){
+            if (isList) {
                 imageView = itemView.findViewById(R.id.list_image_view);
                 listMore = itemView.findViewById(R.id.list_more);
                 imageView = itemView.findViewById(R.id.list_image_view);
@@ -240,7 +248,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaAudioAdapter.Me
                 linear = itemView.findViewById(R.id.list_linearLayout);
                 listMore = itemView.findViewById(R.id.list_more);
                 mediaDate = itemView.findViewById(R.id.media_size_date_list);
-            }else{
+            } else {
                 imageView = itemView.findViewById(R.id.grid_image_view);
                 mediaName = itemView.findViewById(R.id.media_name_grid);
                 mediaSize = itemView.findViewById(R.id.media_size);

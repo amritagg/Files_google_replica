@@ -5,11 +5,16 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.app.LoaderManager;
 import androidx.loader.content.Loader;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -17,11 +22,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
+import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaVideoAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaVideoLoader;
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.utils.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.Models.VideoUtil;
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -38,6 +43,7 @@ public class MediaVideoActivity extends AppCompatActivity
     private ArrayList<VideoUtil> videoUtils;
     private MediaVideoAdapter videoAdapter;
     private boolean isList = false;
+    private BottomSheetDialog bottomSheetDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,6 +52,20 @@ public class MediaVideoActivity extends AppCompatActivity
 
         initialiseRecyclerView();
         showVideos();
+        LocalBroadcastManager.getInstance(this).registerReceiver(sortReceiver,
+                new IntentFilter(BottomSheetDialog.VIDEO_TAG));
+    }
+
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelableArrayList("list", videoUtils);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        videoUtils = savedInstanceState.getParcelableArrayList("list");
     }
 
     private void showVideos(){
@@ -68,7 +88,7 @@ public class MediaVideoActivity extends AppCompatActivity
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<VideoUtil>> loader, ArrayList<VideoUtil> data) {
 
         Log.e(LOG_TAG, "Done onLoadFinished");
-        videoUtils.addAll(data);
+        if(videoUtils.isEmpty()) videoUtils.addAll(data);
         progressBar.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
         videoAdapter.notifyDataSetChanged();
@@ -86,29 +106,9 @@ public class MediaVideoActivity extends AppCompatActivity
     @SuppressLint({"NotifyDataSetChanged", "UseCompatLoadingForDrawables"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if(item.getItemId() == R.id.sort_date){
-            ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
-            videoUtils.sort(Comparator.comparingLong(VideoUtil::getDate));
-
-            if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
-            videoAdapter.notifyDataSetChanged();
-
-            return true;
-        }else if (item.getItemId() == R.id.sort_name){
-            ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
-            videoUtils.sort(Comparator.comparing(VideoUtil::getName));
-
-            if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
-            videoAdapter.notifyDataSetChanged();
-
-            return true;
-        }else if(item.getItemId() == R.id.sort_size){
-            ArrayList<VideoUtil> temp = new ArrayList<>(videoUtils);
-            videoUtils.sort(Comparator.comparingInt(VideoUtil::getSize));
-
-            if(videoUtils.equals(temp)) Collections.reverse(videoUtils);
-            videoAdapter.notifyDataSetChanged();
-
+        if (item.getItemId() == R.id.sort_by) {
+            bottomSheetDialog = new BottomSheetDialog(this, BottomSheetDialog.VIDEO_TAG);
+            bottomSheetDialog.show(getSupportFragmentManager(), "ModelBottomSheet");
             return true;
         } else if(item.getItemId() == android.R.id.home) {
             finish();
@@ -151,5 +151,38 @@ public class MediaVideoActivity extends AppCompatActivity
         videoAdapter = new MediaVideoAdapter(this, videoUtils, isList);
         recyclerView.setAdapter(videoAdapter);
     }
+
+    public BroadcastReceiver sortReceiver = new BroadcastReceiver() {
+        @SuppressLint("NotifyDataSetChanged")
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String tag = intent.getStringExtra(BottomSheetDialog.TAG);
+            switch (tag) {
+                case BottomSheetDialog.LARGEST_FIRST:
+                    videoUtils.sort(Comparator.comparingInt(VideoUtil::getSize));
+                    Collections.reverse(videoUtils);
+                    break;
+                case BottomSheetDialog.SMALLEST_FIRST:
+                    videoUtils.sort(Comparator.comparingInt(VideoUtil::getSize));
+                    break;
+                case BottomSheetDialog.NEWEST_FIRST:
+                    videoUtils.sort(Comparator.comparingLong(VideoUtil::getDate));
+                    Collections.reverse(videoUtils);
+                    break;
+                case BottomSheetDialog.OLDEST_FIRST:
+                    videoUtils.sort(Comparator.comparingLong(VideoUtil::getDate));
+                    break;
+                case BottomSheetDialog.A_TO_Z:
+                    videoUtils.sort(Comparator.comparing(VideoUtil::getName));
+                    break;
+                case BottomSheetDialog.Z_TO_A:
+                    videoUtils.sort(Comparator.comparing(VideoUtil::getName));
+                    Collections.reverse(videoUtils);
+                    break;
+            }
+            videoAdapter.notifyDataSetChanged();
+            bottomSheetDialog.dismiss();
+        }
+    };
 
 }

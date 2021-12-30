@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowImageActivity;
-import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.Models.ImageUtil;
 import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
@@ -202,12 +202,17 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaImageAdapter.Me
         String size_string = getSize(imageUtil.get(position).getSize());
 
         Date date = new Date(imageUtil.get(position).getDate() * 1000);
+        @SuppressLint("SimpleDateFormat")
+        SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy, hh:mm:aa");
+        String dateText = df2.format(date);
         bundle.putString("uri", imageUtil.get(position).getUri());
         bundle.putString("name", imageUtil.get(position).getName());
         bundle.putString("location", imageUtil.get(position).getPath());
-        bundle.putString("time", date.toString());
+        bundle.putString("time", dateText);
         bundle.putString("size", size_string);
+        bundle.putInt("isMedia", 0);
         intent.putExtra("INFO", bundle);
+
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
     }

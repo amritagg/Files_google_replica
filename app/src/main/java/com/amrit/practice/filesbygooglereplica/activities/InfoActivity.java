@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Size;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.bumptech.glide.Glide;
 
+import java.io.File;
 import java.io.IOException;
 
 public class InfoActivity extends AppCompatActivity {
@@ -38,21 +40,53 @@ public class InfoActivity extends AppCompatActivity {
         String location_string = bundle.getString("location");
         String time_string = bundle.getString("time");
         String size_string = bundle.getString("size");
+        int mediaType = bundle.getInt("isMedia");
 
-        try {
-            Bitmap bitmap = getContentResolver().loadThumbnail(
-                    Uri.parse(uri_string),
-                    new Size(200, 200),
-                    null
-            );
-            image.setImageBitmap(bitmap);
-        } catch (IOException e) {
-            image.setImageDrawable(getDrawable(R.drawable.ic_baseline_audiotrack_24));
+        /*
+        media image = 0;
+        media audio = 1;
+        media video = 2;
+        media document = 3;
+        internal image = 4;
+        internal audio = 5;
+        internal video = 6;
+        * */
+
+        switch (mediaType) {
+            case 0:
+            case 2:
+                Glide.with(this)
+                        .load(Uri.parse(uri_string))
+                        .into(image);
+                break;
+            case 1:
+            case 5:
+                try {
+                    Bitmap bitmap = getContentResolver().loadThumbnail(
+                            Uri.parse(uri_string),
+                            new Size(200, 200),
+                            null
+                    );
+                    image.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    image.setImageDrawable(getDrawable(R.drawable.ic_baseline_audiotrack_24));
+                }
+                break;
+            case 4:
+                image.setImageURI(Uri.parse(uri_string));
+                break;
+            case 6:
+                try {
+                    Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(uri_string),
+                            new Size(200, 200), null);
+                    image.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    image.setImageDrawable(getDrawable(R.drawable.ic_baseline_videocam_24));
+                }
+                break;
+
         }
-
-//        Glide.with(this)
-//                .load(Uri.parse(uri_string))
-//                .into(image);
 
         name.setText(name_string);
         location.setText(location_string + name_string);

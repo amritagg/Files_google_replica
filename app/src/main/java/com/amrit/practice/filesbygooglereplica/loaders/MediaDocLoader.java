@@ -6,33 +6,22 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
 import android.util.Log;
-import android.util.Size;
 import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.amrit.practice.filesbygooglereplica.utils.DocumentsUtil;
-import com.amrit.practice.filesbygooglereplica.utils.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.Models.DocumentsUtil;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Objects;
-import java.util.Queue;
 
 public class MediaDocLoader extends AsyncTaskLoader<ArrayList<DocumentsUtil>> {
 
