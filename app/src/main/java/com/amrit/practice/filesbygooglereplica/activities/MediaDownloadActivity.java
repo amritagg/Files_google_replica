@@ -24,7 +24,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
-import com.amrit.practice.filesbygooglereplica.Models.DownloadUtils;
+import com.amrit.practice.filesbygooglereplica.models.DownloadUtils;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaDownloadAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaDownloadLoader;
 import com.amrit.practice.filesbygooglereplica.R;

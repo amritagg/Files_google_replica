@@ -1,47 +1,55 @@
-package com.amrit.practice.filesbygooglereplica.Models;
+package com.amrit.practice.filesbygooglereplica.models;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class DownloadUtils implements Parcelable {
+public class DocumentsUtil implements Parcelable {
 
-    //  Required Params for the Download Files
+    //  Required Params for the Document Files
     private String uri;
     private int size;
-    private String name;
     private long date;
-    private final String location;
+    private String name;
+    private final Bitmap bitmap;
+    private String location;
 
     // Constructor for the same
-    public DownloadUtils(String uri, int size, String name, long date, String location) {
+    public DocumentsUtil(String uri, int size, String name, Bitmap bitmap, long date, String location) {
         this.uri = uri;
         this.size = size;
         this.name = name;
+        this.bitmap = bitmap;
         this.date = date;
         this.location = location;
     }
 
-    protected DownloadUtils(Parcel in) {
+    protected DocumentsUtil(Parcel in) {
         uri = in.readString();
         size = in.readInt();
-        name = in.readString();
         date = in.readLong();
+        name = in.readString();
+        bitmap = in.readParcelable(Bitmap.class.getClassLoader());
         location = in.readString();
     }
 
-    public static final Creator<DownloadUtils> CREATOR = new Creator<DownloadUtils>() {
+    public static final Creator<DocumentsUtil> CREATOR = new Creator<DocumentsUtil>() {
         @Override
-        public DownloadUtils createFromParcel(Parcel in) {
-            return new DownloadUtils(in);
+        public DocumentsUtil createFromParcel(Parcel in) {
+            return new DocumentsUtil(in);
         }
 
         @Override
-        public DownloadUtils[] newArray(int size) {
-            return new DownloadUtils[size];
+        public DocumentsUtil[] newArray(int size) {
+            return new DocumentsUtil[size];
         }
     };
 
     // Getters to get the values
+    public Bitmap getBitmap(){
+        return bitmap;
+    }
+
     public String getUri() {
         return uri;
     }
@@ -74,6 +82,14 @@ public class DownloadUtils implements Parcelable {
         this.date = date;
     }
 
+    public String getLocation() {
+        return location;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -83,8 +99,10 @@ public class DownloadUtils implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(uri);
         dest.writeInt(size);
-        dest.writeString(name);
         dest.writeLong(date);
+        dest.writeString(name);
+        dest.writeParcelable(bitmap, flags);
         dest.writeString(location);
     }
+
 }

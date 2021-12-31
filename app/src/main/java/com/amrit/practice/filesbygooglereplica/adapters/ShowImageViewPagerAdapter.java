@@ -6,16 +6,20 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
 import androidx.annotation.NonNull;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.viewHolder.ViewPagerViewHolder;
 import com.bumptech.glide.Glide;
-import com.github.chrisbanes.photoview.PhotoView;
+
 import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
-public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageViewPagerAdapter.ViewHolder> {
+public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ViewPagerViewHolder> {
 
     private final Context mContext;
     private final ArrayList<String> imageUris;
@@ -30,13 +34,13 @@ public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageVie
     @NonNull
     @NotNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
+    public ViewPagerViewHolder onCreateViewHolder(@NonNull @NotNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.show_image_card, parent, false);
-        return new ViewHolder(view);
+        return new ViewPagerViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull @NotNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull @NotNull ViewPagerViewHolder holder, int position) {
 
         holder.imageView.setOnClickListener(view -> {
             Intent intent = new Intent("show_hide");
@@ -58,16 +62,6 @@ public class ShowImageViewPagerAdapter extends RecyclerView.Adapter<ShowImageVie
     @Override
     public int getItemCount() {
         return imageUris.size();
-    }
-
-    static class ViewHolder extends RecyclerView.ViewHolder {
-
-        PhotoView imageView;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            imageView = itemView.findViewById(R.id.show_image_view_pager_image);
-        }
     }
 
 }

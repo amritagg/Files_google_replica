@@ -1,6 +1,5 @@
-package com.amrit.practice.filesbygooglereplica.Models;
+package com.amrit.practice.filesbygooglereplica.models;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -29,16 +28,14 @@ public class AudioUtil implements Parcelable {
     private final String uri;
     private final int size;
     private final String name;
-    private final Bitmap bitmap;
     private final long date;
     private final String location;
 
     // Constructor for the same
-    public AudioUtil(String uri, int size, String name, Bitmap bitmap, String location, long date) {
+    public AudioUtil(String uri, int size, String name, String location, long date) {
         this.uri = uri;
         this.size = size;
         this.name = name;
-        this.bitmap = bitmap;
         this.location = location;
         this.date = date;
     }
@@ -46,10 +43,6 @@ public class AudioUtil implements Parcelable {
     // Getters to get the values
     public long getDate() {
         return date;
-    }
-
-    public Bitmap getBitmap() {
-        return bitmap;
     }
 
     public String getUri() {
@@ -75,7 +68,6 @@ public class AudioUtil implements Parcelable {
         name = in.readString();
         date = in.readLong();
         location = in.readString();
-        bitmap = in.readParcelable(Bitmap.class.getClassLoader());
     }
 
     public int describeContents(){
@@ -88,7 +80,6 @@ public class AudioUtil implements Parcelable {
         dest.writeString(name);
         dest.writeLong(date);
         dest.writeString(location);
-        dest.writeParcelable(bitmap, flags);
     }
 
     public static boolean isAudio(String name) {

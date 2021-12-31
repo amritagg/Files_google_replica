@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.amrit.practice.filesbygooglereplica.Models.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.models.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;

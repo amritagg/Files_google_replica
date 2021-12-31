@@ -27,7 +27,7 @@ import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaImageAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaImageLoader;
-import com.amrit.practice.filesbygooglereplica.Models.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.models.ImageUtil;
 
 import org.jetbrains.annotations.NotNull;
 

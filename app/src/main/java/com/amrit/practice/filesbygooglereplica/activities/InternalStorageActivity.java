@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.media.Image;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -24,10 +23,10 @@ import com.amrit.practice.filesbygooglereplica.listener.OnImageClickListener;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.adapters.InternalStorageAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.InternalStorageLoader;
-import com.amrit.practice.filesbygooglereplica.Models.AudioUtil;
-import com.amrit.practice.filesbygooglereplica.Models.ImageUtil;
-import com.amrit.practice.filesbygooglereplica.Models.InternalStorageUtil;
-import com.amrit.practice.filesbygooglereplica.Models.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.models.AudioUtil;
+import com.amrit.practice.filesbygooglereplica.models.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.models.InternalStorageUtil;
+import com.amrit.practice.filesbygooglereplica.models.VideoUtil;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -185,8 +184,6 @@ public class InternalStorageActivity extends AppCompatActivity
         int total = -1;
         int current = -1;
 
-        ArrayList<ImageUtil> data = new ArrayList<>();
-
         for(InternalStorageUtil util: utils){
             String nam = util.getName();
             if(ImageUtil.isImage(nam)){
@@ -259,7 +256,7 @@ public class InternalStorageActivity extends AppCompatActivity
         bundle.putInt("position", current);
 
         Intent intent = new Intent(InternalStorageActivity.this, ShowAudioActivity.class);
-        intent.putExtra("INFO", bundle);
+        intent.putExtra("from_internal", bundle);
         startActivity(intent);
     }
 

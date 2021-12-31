@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.amrit.practice.filesbygooglereplica.utilities.BottomSheetDialog;
-import com.amrit.practice.filesbygooglereplica.Models.AudioUtil;
+import com.amrit.practice.filesbygooglereplica.models.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.adapters.MediaAudioAdapter;
 import com.amrit.practice.filesbygooglereplica.loaders.MediaAudioLoader;
 import com.amrit.practice.filesbygooglereplica.R;

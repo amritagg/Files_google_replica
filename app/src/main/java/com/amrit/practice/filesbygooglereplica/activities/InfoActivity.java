@@ -8,11 +8,13 @@ import android.graphics.Bitmap;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Size;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.utilities.MyCache;
 import com.bumptech.glide.Glide;
 
 import java.io.File;
@@ -24,7 +26,7 @@ public class InfoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_info);
+        setContentView(R.layout.activity_info);
 
         ImageView image = findViewById(R.id.info_activity_image);
         TextView name = findViewById(R.id.image_name);
@@ -60,7 +62,6 @@ public class InfoActivity extends AppCompatActivity {
                         .into(image);
                 break;
             case 1:
-            case 5:
                 try {
                     Bitmap bitmap = getContentResolver().loadThumbnail(
                             Uri.parse(uri_string),
@@ -75,6 +76,14 @@ public class InfoActivity extends AppCompatActivity {
             case 4:
                 image.setImageURI(Uri.parse(uri_string));
                 break;
+            case 5:
+                try {
+                    Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(uri_string),
+                            new Size(200, 200), null);
+                    image.setImageBitmap(bitmap);
+                } catch (IOException e) {
+                    image.setImageDrawable(getDrawable(R.drawable.ic_baseline_audiotrack_24));
+                }
             case 6:
                 try {
                     Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(uri_string),

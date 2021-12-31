@@ -11,10 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -24,7 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.InfoActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowVideoActivity;
-import com.amrit.practice.filesbygooglereplica.Models.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.models.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.viewHolder.MediaViewHolder;
 import com.bumptech.glide.Glide;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.MediaVideoViewHolder>{
+public class MediaVideoAdapter extends RecyclerView.Adapter<MediaViewHolder>{
 
     private final ArrayList<VideoUtil> videoUtil;
     private final Context context;
@@ -47,7 +45,7 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
     @NonNull
     @SuppressLint("InflateParams")
     @Override
-    public MediaVideoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MediaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView;
         if(isList){
             layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
@@ -57,12 +55,12 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
 
-        return new MediaVideoViewHolder(layoutView, isList);
+        return new MediaViewHolder(layoutView, isList);
     }
 
     @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     @Override
-    public void onBindViewHolder(@NonNull MediaVideoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
         if(isList){
             Date date = new Date(videoUtil.get(position).getDate()*1000);
             Log.e("MediaVideoAdapter", videoUtil.get(position).getDate() + " " + position);
@@ -125,7 +123,7 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
     }
 
     @SuppressLint("NonConstantResourceId")
-    private void setupPopup(MediaVideoViewHolder holder, int position) {
+    private void setupPopup(MediaViewHolder holder, int position) {
         holder.listMore.setOnClickListener(view -> {
             PopupMenu popupMenu = new PopupMenu(context.getApplicationContext(), holder.listMore);
             popupMenu.getMenuInflater().inflate(R.menu.popup, popupMenu.getMenu());
@@ -226,33 +224,6 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaVideoAdapter.Me
         sizeFloat = sizeFloat / 1024;
         sizeFloat = (float) (Math.round(sizeFloat * 100.0) / 100.0);
         return sizeFloat + "MB";
-    }
-
-    public static class MediaVideoViewHolder extends RecyclerView.ViewHolder{
-
-        ImageView imageView;
-        ImageView listMore;
-        TextView mediaName;
-        TextView mediaSize;
-        TextView mediaDate;
-        LinearLayout linear;
-        RelativeLayout relative;
-
-        public MediaVideoViewHolder(@NonNull View itemView, boolean isList) {
-            super(itemView);
-            if(isList){
-                imageView = itemView.findViewById(R.id.list_image_view);
-                mediaName = itemView.findViewById(R.id.media_name_list);
-                linear = itemView.findViewById(R.id.list_linearLayout);
-                listMore = itemView.findViewById(R.id.list_more);
-                mediaDate = itemView.findViewById(R.id.media_size_date_list);
-            }else{
-                imageView = itemView.findViewById(R.id.grid_image_view);
-                mediaName = itemView.findViewById(R.id.media_name_grid);
-                mediaSize = itemView.findViewById(R.id.media_size);
-                relative = itemView.findViewById(R.id.grid_layout);
-            }
-        }
     }
 
 }

@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
 
-import com.amrit.practice.filesbygooglereplica.Models.ImageUtil;
+import com.amrit.practice.filesbygooglereplica.models.ImageUtil;
 
 import org.jetbrains.annotations.NotNull;
 

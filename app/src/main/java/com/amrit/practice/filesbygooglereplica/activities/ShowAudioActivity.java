@@ -34,6 +34,7 @@ public class ShowAudioActivity extends AppCompatActivity {
     private boolean playWhenReady = true;
     private int currentWindow = 0;
     private long playbackPosition = 0;
+    private boolean isMedia;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,13 +48,19 @@ public class ShowAudioActivity extends AppCompatActivity {
         Button info = findViewById(R.id.audio_info);
 
         Intent intent = getIntent();
-        Bundle bundle = intent.getBundleExtra("INFO");
+        Bundle bundle;
+
+        if(intent.hasExtra("INFO")) bundle = intent.getBundleExtra("INFO");
+        else bundle = intent.getBundleExtra("from_internal");
+
         audioUris = bundle.getStringArrayList("uris");
         audio_dates = bundle.getLongArray("dates");
         audioLocations = bundle.getStringArrayList("location");
         audioNames = bundle.getStringArrayList("names");
         audioSize = bundle.getIntegerArrayList("size");
         position = bundle.getInt("position");
+
+        isMedia = intent.hasExtra("INFO");
 
         info.setOnClickListener(view -> infoAudio());
         delete.setOnClickListener(view -> deleteAudio());
@@ -99,7 +106,7 @@ public class ShowAudioActivity extends AppCompatActivity {
         bundle.putString("location", audioLocations.get(n));
         bundle.putString("time", dateText);
         bundle.putString("size", getSize(audioSize.get(n)));
-        bundle.putInt("isMedia", 1);
+        bundle.putInt("isMedia", (isMedia) ? 1 : 5);
         intent.putExtra("INFO", bundle);
         startActivity(intent);
 

@@ -11,9 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,14 +18,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.ShowPdfActivity;
-import com.amrit.practice.filesbygooglereplica.Models.DocumentsUtil;
+import com.amrit.practice.filesbygooglereplica.models.DocumentsUtil;
+import com.amrit.practice.filesbygooglereplica.viewHolder.MediaViewHolder;
+
 import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaDocViewHolder> {
+public class MediaDocAdapter extends RecyclerView.Adapter<MediaViewHolder> {
 
     private final Context context;
     private final ArrayList<DocumentsUtil> data;
@@ -45,7 +44,7 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaD
     @SuppressLint("InflateParams")
     @NonNull
     @Override
-    public MediaDocViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public MediaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View layoutView;
         if(isList){
             layoutView = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_media, null, false);
@@ -55,12 +54,12 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaD
         RecyclerView.LayoutParams lp = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         layoutView.setLayoutParams(lp);
 
-        return new MediaDocViewHolder(layoutView, isList);
+        return new MediaViewHolder(layoutView, isList);
     }
 
     @SuppressLint({"UseCompatLoadingForDrawables", "SetTextI18n"})
     @Override
-    public void onBindViewHolder(@NonNull MediaDocViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MediaViewHolder holder, int position) {
         if(isList){
             Date date = new Date(data.get(position).getDate()*1000);
             @SuppressLint("SimpleDateFormat")
@@ -188,37 +187,6 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaDocAdapter.MediaD
     }
 
     private void infoDocument(int position) {
-    }
-
-    public static class MediaDocViewHolder extends RecyclerView.ViewHolder {
-
-        ImageView imageView;
-//        TextView textName;
-//        ImageView list_more;
-//        LinearLayout layout;
-
-        ImageView listMore;
-        TextView mediaName;
-        TextView mediaSize;
-        TextView mediaDate;
-        LinearLayout linear;
-        RelativeLayout relative;
-
-        public MediaDocViewHolder(@NonNull View itemView, boolean isList) {
-            super(itemView);
-            if(isList){
-                imageView = itemView.findViewById(R.id.list_image_view);
-                mediaName = itemView.findViewById(R.id.media_name_list);
-                linear = itemView.findViewById(R.id.list_linearLayout);
-                listMore = itemView.findViewById(R.id.list_more);
-                mediaDate = itemView.findViewById(R.id.media_size_date_list);
-            }else{
-                imageView = itemView.findViewById(R.id.grid_image_view);
-                mediaName = itemView.findViewById(R.id.media_name_grid);
-                mediaSize = itemView.findViewById(R.id.media_size);
-                relative = itemView.findViewById(R.id.grid_layout);
-            }
-        }
     }
 
 }

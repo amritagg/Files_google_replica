@@ -1,4 +1,4 @@
-package com.amrit.practice.filesbygooglereplica.Models;
+package com.amrit.practice.filesbygooglereplica.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

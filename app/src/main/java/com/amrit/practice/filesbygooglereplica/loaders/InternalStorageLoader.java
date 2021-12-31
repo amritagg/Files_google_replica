@@ -1,24 +1,32 @@
 package com.amrit.practice.filesbygooglereplica.loaders;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
+import android.net.Uri;
+import android.util.Log;
+import android.util.Size;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
-import com.amrit.practice.filesbygooglereplica.Models.InternalStorageUtil;
+
+import com.amrit.practice.filesbygooglereplica.models.AudioUtil;
+import com.amrit.practice.filesbygooglereplica.models.InternalStorageUtil;
+import com.amrit.practice.filesbygooglereplica.utilities.MyCache;
+
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class InternalStorageLoader extends AsyncTaskLoader<ArrayList<InternalStorageUtil>> {
 
+    private static final String LOG_TAG = InternalStorageLoader.class.getSimpleName();
     private final File file;
 
     public InternalStorageLoader(@NonNull @NotNull Context context, File file) {
@@ -60,6 +68,18 @@ public class InternalStorageLoader extends AsyncTaskLoader<ArrayList<InternalSto
             }
             String uri = f.getAbsolutePath();
 
+            if(AudioUtil.isAudio(name)){
+                if(MyCache.getInstance().retrieveBitmapFromCache(uri + name) == null) {
+                    // loading bitmap
+                    try {
+                        Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(uri),
+                                new Size(200, 200), null);
+                        MyCache.getInstance().saveBitmapToCache(uri + name, bitmap);
+                    } catch (IOException e) {
+                        Log.e(LOG_TAG, "Bitmap not available");
+                    }
+                }
+            }
             InternalStorageUtil util = new InternalStorageUtil(isFolder, name, uri, size, date);
             list.add(util);
 
