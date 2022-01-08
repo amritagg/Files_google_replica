@@ -1,19 +1,27 @@
 package com.amrit.practice.filesbygooglereplica.loaders;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.pdf.PdfDocument;
 import android.graphics.pdf.PdfRenderer;
 import android.os.ParcelFileDescriptor;
+import android.util.LruCache;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.loader.content.AsyncTaskLoader;
+
+import com.amrit.practice.filesbygooglereplica.utilities.MyCache;
+
 import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
+public class PdfLoader extends AsyncTaskLoader<Integer> {
 
     private final String uri;
 
@@ -34,9 +42,7 @@ public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
-    public ArrayList<Bitmap> loadInBackground() {
-
-        ArrayList<Bitmap> arrayList = new ArrayList<>();
+    public Integer loadInBackground() {
 
         // getting file
         File file = new File(uri);
@@ -52,21 +58,21 @@ public class PdfLoader extends AsyncTaskLoader<ArrayList<Bitmap>> {
 
                 Bitmap mBitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
                 // we render for showing on the screen
+
+                Canvas canvas = new Canvas(mBitmap);
+                canvas.drawColor(Color.WHITE);
+                canvas.drawBitmap(mBitmap, 0, 0, null);
                 page.render(mBitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-
-                // adding bitmap in arraylist
-                arrayList.add(mBitmap);
-
+                MyCache.getInstance().saveBitmapToCache(file.getAbsolutePath() + " " + i, mBitmap);
                 // close the page
                 page.close();
             }
+            return pageCount;
 
         } catch (IOException e) {
             e.printStackTrace();
-            arrayList = null;
+            return -1;
         }
 
-        // return arraylist
-        return arrayList;
     }
 }

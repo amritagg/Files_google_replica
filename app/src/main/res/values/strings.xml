@@ -35,5 +35,6 @@
     <string name="largest_first">Largest first</string>
     <string name="oldest_first">Oldest first</string>
     <string name="newest_first">Newest first</string>
+    <string name="error_occurred">Error Occurred!!</string>
 
 </resources>

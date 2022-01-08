@@ -2,8 +2,12 @@ package com.amrit.practice.filesbygooglereplica.loaders;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.pdf.PdfRenderer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.Size;
 
@@ -72,14 +76,40 @@ public class InternalStorageLoader extends AsyncTaskLoader<ArrayList<InternalSto
                 if(MyCache.getInstance().retrieveBitmapFromCache(uri + name) == null) {
                     // loading bitmap
                     try {
-                        Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(new File(uri),
+                        Bitmap bitmap = ThumbnailUtils.createAudioThumbnail(new File(uri),
                                 new Size(200, 200), null);
                         MyCache.getInstance().saveBitmapToCache(uri + name, bitmap);
                     } catch (IOException e) {
                         Log.e(LOG_TAG, "Bitmap not available");
                     }
                 }
+            }else if(name.endsWith(".pdf")){
+                ParcelFileDescriptor pdf;
+                PdfRenderer pdfRenderer;
+                try {
+                    File file = new File( uri);
+                    pdf = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+                    pdfRenderer = new PdfRenderer(pdf);
+
+                    PdfRenderer.Page page = pdfRenderer.openPage(0);
+
+                    // getting bitmap
+                    Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+
+                    Canvas canvas = new Canvas(bitmap);
+                    canvas.drawColor(Color.WHITE);
+                    canvas.drawBitmap(bitmap, 0, 0, null);
+                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+                    MyCache.getInstance().saveBitmapToCache(uri, bitmap);
+                    page.close();
+
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, e.toString());
+                    e.printStackTrace();
+                }
             }
+
             InternalStorageUtil util = new InternalStorageUtil(isFolder, name, uri, size, date);
             list.add(util);
 

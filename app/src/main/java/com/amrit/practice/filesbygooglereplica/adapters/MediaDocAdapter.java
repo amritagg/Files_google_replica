@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.amrit.practice.filesbygooglereplica.R;
 import com.amrit.practice.filesbygooglereplica.activities.ShowPdfActivity;
 import com.amrit.practice.filesbygooglereplica.models.DocumentsUtil;
+import com.amrit.practice.filesbygooglereplica.utilities.MyCache;
 import com.amrit.practice.filesbygooglereplica.viewHolder.MediaViewHolder;
 
 import org.jetbrains.annotations.NotNull;
@@ -77,8 +78,10 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             holder.relative.setOnClickListener(view -> startImageActivity(position));
         }
 
+        String key = "/storage/emulated/0/" + data.get(position).getLocation() + data.get(position).getName();
+        Log.e(LOG_TAG, key);
         holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        Bitmap bitmap = data.get(position).getBitmap();
+        Bitmap bitmap = MyCache.getInstance().retrieveBitmapFromCache(key);
 
         if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
         else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
@@ -90,9 +93,12 @@ public class MediaDocAdapter extends RecyclerView.Adapter<MediaViewHolder> {
     }
 
     private void startImageActivity(int position) {
-        Intent intent = new Intent(context, ShowPdfActivity.class);
-            intent.putExtra("pdf_uri", data.get(position).getUri());
+        if(data.get(position).getName().endsWith(".pdf")) {
+            Intent intent = new Intent(context, ShowPdfActivity.class);
+            String filePath = "storage/emulated/0/" + data.get(position).getLocation() + data.get(position).getName();
+            intent.putExtra("pdf_uri", filePath);
             context.startActivity(intent);
+        }
     }
 
     @Override

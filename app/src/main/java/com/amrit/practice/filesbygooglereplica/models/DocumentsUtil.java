@@ -11,15 +11,13 @@ public class DocumentsUtil implements Parcelable {
     private int size;
     private long date;
     private String name;
-    private final Bitmap bitmap;
     private String location;
 
     // Constructor for the same
-    public DocumentsUtil(String uri, int size, String name, Bitmap bitmap, long date, String location) {
+    public DocumentsUtil(String uri, int size, String name, long date, String location) {
         this.uri = uri;
         this.size = size;
         this.name = name;
-        this.bitmap = bitmap;
         this.date = date;
         this.location = location;
     }
@@ -29,7 +27,6 @@ public class DocumentsUtil implements Parcelable {
         size = in.readInt();
         date = in.readLong();
         name = in.readString();
-        bitmap = in.readParcelable(Bitmap.class.getClassLoader());
         location = in.readString();
     }
 
@@ -46,10 +43,6 @@ public class DocumentsUtil implements Parcelable {
     };
 
     // Getters to get the values
-    public Bitmap getBitmap(){
-        return bitmap;
-    }
-
     public String getUri() {
         return uri;
     }
@@ -101,7 +94,6 @@ public class DocumentsUtil implements Parcelable {
         dest.writeInt(size);
         dest.writeLong(date);
         dest.writeString(name);
-        dest.writeParcelable(bitmap, flags);
         dest.writeString(location);
     }
 

@@ -27,7 +27,7 @@
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_media.xml" value="0.22" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_show_audio.xml" value="0.1" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_show_image.xml" value="0.19157608695652173" />
-        <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_show_pdf.xml" value="0.20427305888483585" />
+        <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_show_pdf.xml" value="0.1" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/activity_temp.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/bottom_sheet_layout.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/custom_audio_player.xml" value="0.18" />
@@ -38,6 +38,7 @@
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/grid_media.xml" value="0.16" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/list_media.xml" value="0.5" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/list_view.xml" value="0.20416666666666666" />
+        <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/pdf_card.xml" value="0.22" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/layout/show_image_card.xml" value="0.11956521739130435" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/menu/media_menu.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/Amrit/AndroidStudioProjects/FilesByGoogleReplica/app/src/main/res/menu/popup.xml" value="0.20416666666666666" />

@@ -1,13 +1,12 @@
 package com.amrit.practice.filesbygooglereplica.adapters;
 
 import android.annotation.SuppressLint;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.amrit.practice.filesbygooglereplica.R;
-import com.amrit.practice.filesbygooglereplica.activities.InternalStorageActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowAudioActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowImageActivity;
 import com.amrit.practice.filesbygooglereplica.activities.ShowPdfActivity;
@@ -27,14 +25,13 @@ import com.amrit.practice.filesbygooglereplica.activities.ShowVideoActivity;
 import com.amrit.practice.filesbygooglereplica.models.AudioUtil;
 import com.amrit.practice.filesbygooglereplica.models.DownloadUtils;
 import com.amrit.practice.filesbygooglereplica.models.ImageUtil;
-import com.amrit.practice.filesbygooglereplica.models.InternalStorageUtil;
 import com.amrit.practice.filesbygooglereplica.models.VideoUtil;
+import com.amrit.practice.filesbygooglereplica.utilities.MyCache;
 import com.amrit.practice.filesbygooglereplica.viewHolder.MediaViewHolder;
 import com.bumptech.glide.Glide;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -91,13 +88,25 @@ public class MediaDownloadAdapter extends RecyclerView.Adapter<MediaViewHolder> 
 
         holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         Uri contentUris = Uri.parse(downloadUtils.get(position).getUri());
-        Glide.with(context)
-                .load(contentUris)
-                .placeholder(context.getDrawable(R.drawable.ic_baseline_document_24))
-                .error(context.getDrawable(R.drawable.ic_baseline_document_24))
-                .into(holder.imageView);
-        holder.mediaName.setText(downloadUtils.get(position).getName());
+        String name = downloadUtils.get(position).getName();
+        if(name.endsWith(".pdf") || AudioUtil.isAudio(name)){
+            String key = "/storage/emulated/0/" + downloadUtils.get(position).getLocation() + name;
+            Bitmap bitmap = MyCache.getInstance().retrieveBitmapFromCache(key);
 
+            Log.e("LOG", key);
+            if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
+            else {
+                if (name.endsWith(".pdf")) holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
+                else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_audiotrack_24));
+            }
+        }else if(ImageUtil.isImage(name) || VideoUtil.isVideo(name)){
+            Glide.with(context)
+                    .load(contentUris)
+                    .placeholder(context.getDrawable(R.drawable.ic_baseline_document_24))
+                    .into(holder.imageView);
+        }else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
+
+        holder.mediaName.setText(name);
     }
 
     @Override
@@ -134,22 +143,11 @@ public class MediaDownloadAdapter extends RecyclerView.Adapter<MediaViewHolder> 
 
     private void startPdfViewer(int position) {
 
-        File file = new File("/storage/emulated/0/"  + downloadUtils.get(position).getLocation() + downloadUtils.get(position).getName());
-        Intent target = new Intent(Intent.ACTION_VIEW);
-        Log.e("SHORT", downloadUtils.get(position).getLocation());
-        target.setDataAndType(Uri.fromFile(file),"application/pdf");
-        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        Intent intent = new Intent(context, ShowPdfActivity.class);
+        String filePath = "storage/emulated/0/" + downloadUtils.get(position).getLocation() + downloadUtils.get(position).getName();
+        intent.putExtra("pdf_uri", filePath);
+        context.startActivity(intent);
 
-        Intent intent = Intent.createChooser(target, "Open File");
-        try {
-            context.startActivity(intent);
-        } catch (ActivityNotFoundException e) {
-            Toast.makeText(context, "install a pdf viewer", Toast.LENGTH_SHORT).show();
-            // Instruct the user to install a PDF reader here, or something
-        }
-//        Intent intent = new Intent(context, ShowPdfActivity.class);
-//        intent.putExtra("pdf_uri", downloadUtils.get(position).getUri());
-//        context.startActivity(intent);
     }
 
     private void startImageShower(int pos) {
@@ -170,7 +168,7 @@ public class MediaDownloadAdapter extends RecyclerView.Adapter<MediaViewHolder> 
                 image_uris.add(util.getUri());
                 image_location.add(util.getUri());
                 image_names.add(util.getName());
-                image_size.add((int) util.getSize());
+                image_size.add(util.getSize());
                 image_date.add(util.getDate());
 
                 if(nam.equals(name)) current = total;
@@ -214,7 +212,7 @@ public class MediaDownloadAdapter extends RecyclerView.Adapter<MediaViewHolder> 
                 audio_uris.add(downloadUtils.get(i).getUri());
                 audio_location.add(downloadUtils.get(i).getUri());
                 audio_names.add(downloadUtils.get(i).getName());
-                audio_size.add((int) downloadUtils.get(i).getSize());
+                audio_size.add(downloadUtils.get(i).getSize());
                 audio_dates.add(downloadUtils.get(i).getDate());
                 if (n.equals(name)) current = total;
             }
@@ -253,7 +251,7 @@ public class MediaDownloadAdapter extends RecyclerView.Adapter<MediaViewHolder> 
             String n = utils.getName();
             if (VideoUtil.isVideo(n)) {
                 total++;
-                video_size.add((int)utils.getSize());
+                video_size.add(utils.getSize());
                 video_uris.add(utils.getUri());
                 video_names.add(utils.getName());
                 video_location.add(utils.getUri());

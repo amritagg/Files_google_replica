@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -142,6 +144,7 @@ public class InternalStorageActivity extends AppCompatActivity
         nothing = findViewById(R.id.nothing);
         recyclerView = findViewById(R.id.media_recycler_view);
         recyclerView.setVisibility(View.GONE);
+        nothing.setVisibility(View.GONE);
         utils = new ArrayList<>();
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(false);
@@ -166,10 +169,32 @@ public class InternalStorageActivity extends AppCompatActivity
                 startVideoPlayer(pos);
             } else if (ImageUtil.isImage(name)) {
                 startImageShower(pos);
+            } else if (name.endsWith(".pdf")) {
+                startPdfShower(pos);
             } else {
                 Toast.makeText(getApplicationContext(), "Can't find app to open the file", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void startPdfShower(int pos) {
+        Intent intent = new Intent(this, ShowPdfActivity.class);
+        intent.putExtra("pdf_uri", utils.get(pos).getUri());
+        startActivity(intent);
+//        File file = new File(utils.get(pos).getUri());
+//        Intent target = new Intent(Intent.ACTION_VIEW);
+////        Log.e("SHORT", downloadUtils.get(position).getLocation());
+//        target.setDataAndType(Uri.fromFile(file),"application/pdf");
+//        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+//
+//        Log.e(LOG_TAG, file.getAbsolutePath());
+//        Intent intent = Intent.createChooser(target, "Open File");
+//        try {
+//            startActivity(intent);
+//        } catch (ActivityNotFoundException e) {
+//            Toast.makeText(this, "install a pdf viewer", Toast.LENGTH_SHORT).show();
+//            // Instruct the user to install a PDF reader here, or something
+//        }
     }
 
     private void startImageShower(int pos) {
