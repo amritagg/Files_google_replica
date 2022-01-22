@@ -13,6 +13,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.models.AudioUtil;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -64,19 +65,7 @@ public class ShowAudioActivity extends AppCompatActivity {
 
         info.setOnClickListener(view -> infoAudio());
         delete.setOnClickListener(view -> deleteAudio());
-        share.setOnClickListener(view -> shareAudio());
-    }
-
-    private void shareAudio() {
-        Uri uri = Uri.parse(audioUris.get(position));
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        sendIntent.setType("audio/*");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(shareIntent);
+        share.setOnClickListener(view -> AudioUtil.shareAudio(audioUris.get(position), this));
     }
 
     private void deleteAudio() {

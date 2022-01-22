@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.models.ImageUtil;
 import com.amrit.practice.filesbygooglereplica.utilities.ViewPagerTransformer;
 import com.amrit.practice.filesbygooglereplica.adapters.ShowImageViewPagerAdapter;
 
@@ -103,9 +104,9 @@ public class ShowImageActivity extends AppCompatActivity {
                 new IntentFilter("show_hide"));
 
         back.setOnClickListener(view -> onBackPressed());
-        share.setOnClickListener(view -> shareImage());
         info.setOnClickListener(view -> infoImage());
         delete.setOnClickListener(view -> deleteImage());
+        share.setOnClickListener(view -> ImageUtil.shareImage(image_uris.get(viewPager2.getCurrentItem()), this));
 
     }
 
@@ -156,19 +157,6 @@ public class ShowImageActivity extends AppCompatActivity {
                         (dialog, which) -> Toast.makeText(getApplicationContext(), "The file " + uri + " will not be deleted", Toast.LENGTH_SHORT).show())
                 .create()
                 .show();
-
-    }
-
-    private void shareImage() {
-
-        Uri uri = Uri.parse(image_uris.get(viewPager2.getCurrentItem()));
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        sendIntent.setType("image/*");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        startActivity(shareIntent);
 
     }
 

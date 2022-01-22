@@ -105,8 +105,4 @@ public class VideoUtil implements Parcelable {
 
     }
 
-    public static void openWith(String uri_string, Context context){
-
-    }
-
 }

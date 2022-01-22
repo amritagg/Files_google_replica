@@ -1,7 +1,11 @@
 package com.amrit.practice.filesbygooglereplica.models;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 public class ImageUtil implements Parcelable {
 
@@ -78,6 +82,28 @@ public class ImageUtil implements Parcelable {
         String[] ext = {".jpg", ".png", ".gif", ".bmp", ".webp", ".heic", ".heif"};
         for (String s : ext) if (name.endsWith(s)) return true;
         return false;
+    }
+
+    public static void shareImage(String uri_string, Context context){
+        Uri uri = Uri.parse(uri_string);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        sendIntent.setType("image/*");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(shareIntent);
+    }
+
+    public static void openWith(String uri_String, Context context){
+        Log.e("Log", uri_String);
+        Intent intent = new Intent();
+        intent.setAction(Intent.ACTION_VIEW);
+        Uri uri = Uri.parse(uri_String);
+        intent.setDataAndType(uri, "image/*");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(intent);
     }
 
 }

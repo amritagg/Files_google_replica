@@ -139,7 +139,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaViewHolder>{
 
                 switch (menuItem.getItemId()){
                     case R.id.share:
-                        shareImage(imageUtil.get(position).getUri());
+                        ImageUtil.shareImage(imageUtil.get(position).getUri(), context);
                         break;
                     case R.id.open_with:
                         imageOpenWith(position);
@@ -173,25 +173,7 @@ public class MediaImageAdapter extends RecyclerView.Adapter<MediaViewHolder>{
     }
 
     private void imageOpenWith(int position) {
-        Intent intent = new Intent();
-        intent.setAction(Intent.ACTION_VIEW);
-        Uri uri = Uri.parse(imageUtil.get(position).getUri());
-        intent.setDataAndType(uri, "image/*");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(intent);
-    }
-
-    private void shareImage(String uri_string) {
-
-        Uri uri = Uri.parse(uri_string);
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        sendIntent.setType("image/*");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(shareIntent);
+        ImageUtil.openWith(imageUtil.get(position).getUri(), context);
     }
 
     private void infoImage(int position) {

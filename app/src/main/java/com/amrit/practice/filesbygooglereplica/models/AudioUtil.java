@@ -1,5 +1,8 @@
 package com.amrit.practice.filesbygooglereplica.models;
 
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -87,6 +90,18 @@ public class AudioUtil implements Parcelable {
         String[] ext = {".mp3", ".wav", ".amr", ".flac", ".aac", ".ogg", ".opus"};
         for (String s : ext) if (name.endsWith(s)) return true;
         return false;
+    }
+
+    public static void shareAudio(String uri_string, Context context){
+        Uri uri = Uri.parse(uri_string);
+        Intent sendIntent = new Intent();
+        sendIntent.setAction(Intent.ACTION_SEND);
+        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
+        sendIntent.setType("audio/*");
+
+        Intent shareIntent = Intent.createChooser(sendIntent, null);
+        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        context.startActivity(shareIntent);
     }
 
 }

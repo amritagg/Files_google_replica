@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.amrit.practice.filesbygooglereplica.R;
+import com.amrit.practice.filesbygooglereplica.models.VideoUtil;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.PlayerView;
@@ -63,19 +64,7 @@ public class ShowVideoActivity extends AppCompatActivity {
 
         info.setOnClickListener(view -> infoVideo());
         delete.setOnClickListener(view -> deleteVideo());
-        share.setOnClickListener(view -> shareVideo());
-    }
-
-    private void shareVideo() {
-        Uri uri = Uri.parse(videoUris.get(position));
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        sendIntent.setType("video/*");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(shareIntent);
+        share.setOnClickListener(view -> VideoUtil.shareVideo(videoUris.get(position), this));
     }
 
     private void deleteVideo() {

@@ -140,7 +140,7 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaViewHolder> {
             popupMenu.setOnMenuItemClickListener(menuItem -> {
                 switch (menuItem.getItemId()) {
                     case R.id.share:
-                        shareAudio(audioUtils.get(position).getUri());
+                        AudioUtil.shareAudio(audioUtils.get(position).getUri(), context);
                         break;
                     case R.id.open_with:
                         audioOpenWith(position);
@@ -179,20 +179,6 @@ public class MediaAudioAdapter extends RecyclerView.Adapter<MediaViewHolder> {
         intent.setDataAndType(uri, "audio/*");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-    }
-
-    private void shareAudio(String uri_string) {
-
-        Uri uri = Uri.parse(uri_string);
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        sendIntent.setType("audio/*");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(shareIntent);
-
     }
 
     private void infoAudio(int position) {

@@ -36,5 +36,7 @@
     <string name="oldest_first">Oldest first</string>
     <string name="newest_first">Newest first</string>
     <string name="error_occurred">Error Occurred!!</string>
+    <string name="hide_private_files">Hide Private Files</string>
+    <string name="show_private_files">Show Private Files</string>
 
 </resources>

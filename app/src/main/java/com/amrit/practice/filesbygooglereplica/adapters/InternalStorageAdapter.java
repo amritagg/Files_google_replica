@@ -55,30 +55,35 @@ public class InternalStorageAdapter
         if (!utils.get(position).isFolder()) {
             holder.imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
 
-            if(AudioUtil.isAudio(utils.get(position).getName())){
+            if (AudioUtil.isAudio(utils.get(position).getName())) {
                 Bitmap bitmap = MyCache.getInstance().retrieveBitmapFromCache(utils.get(position).getUri() + utils.get(position).getName());
 
-                if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
-                else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_audiotrack_24));
+                if (bitmap != null) holder.imageView.setImageBitmap(bitmap);
+                else
+                    holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_audiotrack_24));
 
-            }else if(utils.get(position).getName().endsWith(".pdf")){
+            } else if (utils.get(position).getName().endsWith(".pdf")) {
                 Bitmap bitmap = MyCache.getInstance().retrieveBitmapFromCache(utils.get(position).getUri());
 
-                if(bitmap != null) holder.imageView.setImageBitmap(bitmap);
-                else holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
+                if (bitmap != null) holder.imageView.setImageBitmap(bitmap);
+                else
+                    holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_document_24));
 
-            }else Glide.with(context).load(utils.get(position).getUri()).error(R.drawable.ic_baseline_document_24).into(holder.imageView);
+            } else
+                Glide.with(context).load(utils.get(position).getUri()).error(R.drawable.ic_baseline_document_24).into(holder.imageView);
 
         } else {
             holder.imageView.setImageDrawable(context.getDrawable(R.drawable.ic_baseline_folder_open_24));
         }
 
+        holder.listMore.setVisibility(View.GONE);
         String sizeString = getSize(utils.get(position).getSize());
         @SuppressLint("SimpleDateFormat")
         SimpleDateFormat df2 = new SimpleDateFormat("dd MMM yyyy, hh:mm:aa");
         String dateText = df2.format(utils.get(position).getDate());
         if (!utils.get(position).isFolder()) holder.mediaDate.setText(sizeString + ", " + dateText);
         else holder.mediaDate.setText(dateText);
+
     }
 
     @Override

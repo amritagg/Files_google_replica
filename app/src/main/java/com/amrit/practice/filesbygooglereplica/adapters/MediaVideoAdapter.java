@@ -132,7 +132,7 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaViewHolder>{
 
                 switch (menuItem.getItemId()){
                     case R.id.share:
-                        shareVideo(videoUtil.get(position).getUri());
+                        VideoUtil.shareVideo(videoUtil.get(position).getUri(), context);
                         break;
                     case R.id.open_with:
                         videoOpenWith(position);
@@ -176,20 +176,6 @@ public class MediaVideoAdapter extends RecyclerView.Adapter<MediaViewHolder>{
         intent.setDataAndType(uri, "video/*");
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
-    }
-
-    private void shareVideo(String uri_string) {
-
-        Uri uri = Uri.parse(uri_string);
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, uri);
-        sendIntent.setType("video/*");
-
-        Intent shareIntent = Intent.createChooser(sendIntent, null);
-        shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        context.startActivity(shareIntent);
-
     }
 
     private void infoVideo(int position) {

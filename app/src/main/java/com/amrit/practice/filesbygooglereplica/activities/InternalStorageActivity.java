@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -46,9 +47,11 @@ public class InternalStorageActivity extends AppCompatActivity
     private static final int LOADER_ID = 35;
     private InternalStorageAdapter internalStorageAdapter;
     private ArrayList<InternalStorageUtil> utils;
+    private ArrayList<InternalStorageUtil> permanent;
     private File visibleFileListParent;
     private LoaderManager loaderManager;
     private String HEAD_FILE;
+    private boolean show = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,12 +94,18 @@ public class InternalStorageActivity extends AppCompatActivity
     @Override
     public void onLoadFinished(@NonNull @NotNull Loader<ArrayList<InternalStorageUtil>> loader, ArrayList<InternalStorageUtil> data) {
 
-        Log.e(LOG_TAG, "ye toh ho rha hai");
-//        internalStorageAdapter = new InternalStorageAdapter(this, data, this);
         progressBar.setVisibility(View.GONE);
         Log.e(LOG_TAG, "Done onLoadFinished");
         utils.clear();
-        utils.addAll(data);
+        permanent.clear();
+        permanent.addAll(data);
+        if(!show){
+            for(InternalStorageUtil util: permanent){
+                if(!util.getName().startsWith(".")) utils.add(util);
+            }
+        }else{
+            utils.addAll(permanent);
+        }
         if (utils.size() == 0) {
             nothing.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
@@ -122,7 +131,13 @@ public class InternalStorageActivity extends AppCompatActivity
         }
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.internal_menu, menu);
+        return true;
+    }
+
+    @SuppressLint({"UseCompatLoadingForDrawables", "NotifyDataSetChanged"})
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -133,6 +148,19 @@ public class InternalStorageActivity extends AppCompatActivity
                 showFiles(1);
             }
             return true;
+        }else if(item.getItemId() == R.id.show_hide){
+            utils.clear();
+            if(show){
+                item.setTitle(getString(R.string.show_private_files));
+                for(InternalStorageUtil util: permanent){
+                    if(!util.getName().startsWith(".")) utils.add(util);
+                }
+            }else{
+                item.setTitle(getString(R.string.hide_private_files));
+                utils.addAll(permanent);
+            }
+            internalStorageAdapter.notifyDataSetChanged();
+            show = !show;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -146,6 +174,7 @@ public class InternalStorageActivity extends AppCompatActivity
         recyclerView.setVisibility(View.GONE);
         nothing.setVisibility(View.GONE);
         utils = new ArrayList<>();
+        permanent = new ArrayList<>();
         recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setHasFixedSize(false);
         RecyclerView.LayoutManager linearLayoutManager = new LinearLayoutManager(getApplicationContext(), LinearLayoutManager.VERTICAL, false);
@@ -181,20 +210,6 @@ public class InternalStorageActivity extends AppCompatActivity
         Intent intent = new Intent(this, ShowPdfActivity.class);
         intent.putExtra("pdf_uri", utils.get(pos).getUri());
         startActivity(intent);
-//        File file = new File(utils.get(pos).getUri());
-//        Intent target = new Intent(Intent.ACTION_VIEW);
-////        Log.e("SHORT", downloadUtils.get(position).getLocation());
-//        target.setDataAndType(Uri.fromFile(file),"application/pdf");
-//        target.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-//
-//        Log.e(LOG_TAG, file.getAbsolutePath());
-//        Intent intent = Intent.createChooser(target, "Open File");
-//        try {
-//            startActivity(intent);
-//        } catch (ActivityNotFoundException e) {
-//            Toast.makeText(this, "install a pdf viewer", Toast.LENGTH_SHORT).show();
-//            // Instruct the user to install a PDF reader here, or something
-//        }
     }
 
     private void startImageShower(int pos) {
