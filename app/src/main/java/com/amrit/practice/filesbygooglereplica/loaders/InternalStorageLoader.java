@@ -7,12 +7,14 @@ import android.graphics.Color;
 import android.graphics.pdf.PdfRenderer;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 import android.util.Size;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.loader.content.AsyncTaskLoader;
 
 import com.amrit.practice.filesbygooglereplica.models.AudioUtil;
@@ -44,6 +46,7 @@ public class InternalStorageLoader extends AsyncTaskLoader<ArrayList<InternalSto
         forceLoad();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.Q)
     @Nullable
     @org.jetbrains.annotations.Nullable
     @Override
