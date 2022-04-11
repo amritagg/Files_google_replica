@@ -3,7 +3,7 @@
 In this mobile application I have tried to make replica of Files application by GOOGLE.
 In this app user can see all photos, videos, audios, documents, downloads and also internal storage folders and files
 
-![HOME](./screenshots/HOME.jpg)
+<img src="https://github.com/amritagg/Files_google_replica/blob/master/screenshots/HOME.jpg" height=1000 />
 
 ## FUNCTIONALITIES
 As soon as user opens the application first it asks for permissions to view files in the memory. (This is only one time task, if user provide access to this then the next time he/she opens the app user don't have to again give permission since it's already given)
@@ -20,27 +20,27 @@ As the user select anyone of these user can see all the files of that category.
 
 For everyone of these user have access to show in <b>Grid-View</b> and <b>List-View</b> and you can also sort the files in the way you want to see. Like according to size, date of creation or alphabetically
 
-![SORT](./screenshots/SORT.jpg)
+<img src="https://github.com/amritagg/Files_google_replica/blob/master/screenshots/SORT.jpg" height=1000 />
 
 In the files are being shown in List-View user can use additional functionality by clicking on menu option at the end of each file, from where they can share file, open it with other application, see file information or can even delete file.
 
-![LIST](./screenshots/LIST.jpg)
+<img src="https://github.com/amritagg/Files_google_replica/blob/master/screenshots/LIST.jpg" height=1000 />
 
 Now you can also play show file individually like in case of images you can see individual image on clicking onto it or like in case of audio or video you can play them and also in case of PDF files you can see PDf file using in-built PDF viewer of the app.
 
-![IMAGE](./screenshots/IMAGE.jpg)
+<img src="https://github.com/amritagg/Files_google_replica/blob/master/screenshots/IMAGE.jpg" height=1000 />
 
 User can also get the functionality of share, delete and information while on that file page.
 
 On clicking Info button Information of that file is shown
 
-![INFO](./screenshots/INFO.jpg)
+<img src="https://github.com/amritagg/Files_google_replica/blob/master/screenshots/INFO.jpg" height=1000 />
 
 ### INTERNAL STORAGE
 
 In this section user can see all the folders and files from home directory of the device in List-View.
 
-![INTERNAL](./screenshots/INTERNAL.jpg)
+<img src="https://github.com/amritagg/Files_google_replica/blob/master/screenshots/INTERNAL.jpg" height=1000 />
 
 User can change if he/she wants to see private files/folders or not by using menu option
 On clicking on folder user can see all the folders and files in that folder on which they clicked.
